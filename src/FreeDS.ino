@@ -49,6 +49,7 @@ extern "C" {
 #include "TemperatureManager.h"
 #include "DisplayManager.h"
 #include "EnergyTracker.h"
+#include "CurrentClampSensor.h"
 #include "WebApi.h"
 #include "workingmode.h"
 #include "managers/HttpInverterManager.h"
@@ -72,6 +73,7 @@ NetworkManager g_networkManager;
 TemperatureManager g_temperatureManager;
 DisplayManager g_displayManager;
 EnergyTracker g_energyTracker;
+CurrentClampSensor g_clampSensor;
 WebApi g_webApi;
 
 SurplusManager *g_surplusManager = nullptr;
@@ -165,6 +167,7 @@ void setup() {
 
   g_temperatureManager.begin(PIN_DS18B20, &g_loadController);
   g_energyTracker.begin();
+  g_clampSensor.begin(PIN_ADC_CLAMP);
 
   g_networkManager.begin();
 
@@ -172,7 +175,7 @@ void setup() {
   // (para configurar o Wi-Fi) como o funcionamento normal - substitui o
   // antigo portal cativo HTML à parte.
   g_webApi.begin(&g_loadController, &g_temperatureManager, &g_networkManager, &g_surplusManager,
-                 recreateSurplusManager);
+                 &g_clampSensor, recreateSurplusManager);
 
   if (g_networkManager.isAccessPointMode()) {
     g_displayManager.showLogo("LIGUE-SE AO SSID:\nFreeDS\n192.168.4.1", false);
@@ -210,6 +213,7 @@ void loop() {
   }
 
   g_loadController.update();
+  g_clampSensor.loop(g_loadController.pwmPercent());
   handleButton();
   g_displayManager.update(g_surplusManager, const_cast<uint8_t *>(PIN_RELAY));
 

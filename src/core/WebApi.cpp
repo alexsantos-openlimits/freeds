@@ -52,11 +52,12 @@ const char *workingModeToString(LoadWorkingMode m) {
 } // namespace
 
 void WebApi::begin(LoadController *load, TemperatureManager *temperature, NetworkManager *network,
-                    SurplusManager **surplus, void (*onSurplusModeChanged)()) {
+                    SurplusManager **surplus, CurrentClampSensor *clamp, void (*onSurplusModeChanged)()) {
   load_ = load;
   temperature_ = temperature;
   network_ = network;
   surplus_ = surplus;
+  clamp_ = clamp;
   onSurplusModeChanged_ = onSurplusModeChanged;
 
   server_.addHandler(&events_);
@@ -109,7 +110,11 @@ String WebApi::buildStatusJson() {
   pv2["watts"] = r.pv2Watts;
 
   doc["inverterTemperature"] = r.inverterTemperature;
-  doc["loadWatts"] = r.loadWatts;
+  // Quando a fonte de dados não reporta o consumo da carga, usa a
+  // estimativa da pinça amperimétrica (ou a curva teórica do dimmer),
+  // tal como o antigo readClamp()/currentCalcWatts.
+  bool loadWattsFromSource = f.loadWatts;
+  doc["loadWatts"] = loadWattsFromSource ? r.loadWatts : (clamp_ ? clamp_->lastWatts() : 0);
 
   JsonArray relays = doc.createNestedArray("relays");
   for (uint8_t i = 0; i < 4; i++) {
@@ -156,7 +161,7 @@ String WebApi::buildStatusJson() {
   fields["inverterTemperature"] = f.inverterTemperature;
   fields["batteryWatts"] = f.batteryWatts;
   fields["batterySoc"] = f.batterySoc;
-  fields["loadWatts"] = f.loadWatts;
+  fields["loadWatts"] = f.loadWatts || clamp_ != nullptr;
 
   String out;
   serializeJson(doc, out);
@@ -283,7 +288,7 @@ void WebApi::registerSystemRoutes() {
   });
 
   server_.on("/api/restore", HTTP_POST, [](AsyncWebServerRequest *) {}, nullptr,
-             [](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+             [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
                if (!requireAuth(request)) return;
                if (index + len != total) return;
                String body;
@@ -293,31 +298,27 @@ void WebApi::registerSystemRoutes() {
                  return;
                }
                request->send(200);
-               delay(300);
-               ESP.restart();
+               restartSoon();
              });
 
-  server_.on("/api/factory-reset", HTTP_POST, [](AsyncWebServerRequest *request) {
+  server_.on("/api/factory-reset", HTTP_POST, [this](AsyncWebServerRequest *request) {
     if (!requireAuth(request)) return;
     ConfigStore::resetToDefaults();
     request->send(200);
-    delay(300);
-    ESP.restart();
+    restartSoon();
   });
 
-  server_.on("/api/system/restart", HTTP_POST, [](AsyncWebServerRequest *request) {
+  server_.on("/api/system/restart", HTTP_POST, [this](AsyncWebServerRequest *request) {
     if (!requireAuth(request)) return;
     request->send(200);
-    delay(300);
-    ESP.restart();
+    restartSoon();
   });
 
   // Alias simples para reiniciar sem repor de fábrica (usado pela SPA).
-  server_.on("/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server_.on("/reboot", HTTP_GET, [this](AsyncWebServerRequest *request) {
     if (!requireAuth(request)) return;
     request->send(200);
-    delay(300);
-    ESP.restart();
+    restartSoon();
   });
 
   server_.on(
@@ -361,6 +362,11 @@ void WebApi::registerSystemRoutes() {
           }
         }
       });
+}
+
+void WebApi::restartSoon() {
+  delay(300); // dá tempo à resposta HTTP para ser enviada antes de reiniciar
+  ESP.restart();
 }
 
 void WebApi::loop() {

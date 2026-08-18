@@ -20,6 +20,7 @@
 #include "TemperatureManager.h"
 #include "NetworkManager.h"
 #include "SurplusManager.h"
+#include "CurrentClampSensor.h"
 
 class WebApi {
 public:
@@ -28,7 +29,7 @@ public:
   // modo); onSurplusModeChanged é chamado depois de gravar uma configuração
   // que altere surplus.mode, para o FreeDS.ino recriar o gestor certo.
   void begin(LoadController *load, TemperatureManager *temperature, NetworkManager *network,
-             SurplusManager **surplus, void (*onSurplusModeChanged)());
+             SurplusManager **surplus, CurrentClampSensor *clamp, void (*onSurplusModeChanged)());
 
   void loop(); // envia o estado por SSE periodicamente
 
@@ -46,6 +47,7 @@ private:
   TemperatureManager *temperature_ = nullptr;
   NetworkManager *network_ = nullptr;
   SurplusManager **surplus_ = nullptr;
+  CurrentClampSensor *clamp_ = nullptr;
   void (*onSurplusModeChanged_)() = nullptr;
 
   unsigned long lastStatusPushMs_ = 0;

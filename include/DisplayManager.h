@@ -23,14 +23,19 @@
 #include "AppConfig.h"
 #include "Types.h"
 
-class SSD1306;
+// "SSD1306" (usado pelo resto do código) é apenas um typedef de SSD1306Wire
+// (ver lib/esp8266-oled-ssd1306/src/SSD1306.h); não pode ser forward-declarado
+// como classe ("class SSD1306;") porque isso colidiria com esse typedef em
+// qualquer ficheiro que também inclua SSD1306.h (ex.: FreeDS.ino) - por isso
+// aqui é forward-declarado pelo nome real da classe.
+class SSD1306Wire;
 class LoadController;
 class TemperatureManager;
 class SurplusManager;
 
 class DisplayManager {
 public:
-  void begin(SSD1306 *display, LoadController *loadController, TemperatureManager *temperature);
+  void begin(SSD1306Wire *display, LoadController *loadController, TemperatureManager *temperature);
 
   void showLogo(const String &text, bool blocking);
   void update(const SurplusManager *surplus, uint8_t relayPins[4]);
@@ -46,7 +51,7 @@ private:
   void drawTemperatures();
   void drawBuildInfo();
 
-  SSD1306 *display_ = nullptr;
+  SSD1306Wire *display_ = nullptr;
   LoadController *loadController_ = nullptr;
   TemperatureManager *temperature_ = nullptr;
 

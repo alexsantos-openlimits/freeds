@@ -61,7 +61,10 @@ public:
   bool hasDataFault() const { return variationTimeout_ || connectionTimeout_; }
   bool isRunning() const { return running_; }
   void setRunning(bool running) { running_ = running; }
-  bool isAutomaticMode() const { return pid_.GetMode() == PID::AUTOMATIC; }
+  // Não pode ser const: PID::GetMode() (lib/Arduino-PID-Library-master) não
+  // é const, e chamá-lo sobre pid_ dentro de um método const do LoadController
+  // tornaria pid_ implicitamente const, o que não compila.
+  bool isAutomaticMode() { return pid_.GetMode() == PID::AUTOMATIC; }
   bool isManualAutoOverride() const { return manualAutoOverride_; }
   const RelayOutputState &relayState(uint8_t i) const { return relayState_[i]; }
 

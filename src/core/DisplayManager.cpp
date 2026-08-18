@@ -19,7 +19,7 @@ const char *L(const char *pt, const char *en) {
 }
 } // namespace
 
-void DisplayManager::begin(SSD1306 *display, LoadController *loadController, TemperatureManager *temperature) {
+void DisplayManager::begin(SSD1306Wire *display, LoadController *loadController, TemperatureManager *temperature) {
   display_ = display;
   loadController_ = loadController;
   temperature_ = temperature;
