@@ -1,0 +1,36 @@
+/*
+  MqttService.h - Cliente MQTT partilhado (ligação, publicação e distribuição
+  de mensagens recebidas por tópico)
+
+  Substitui a mistura de responsabilidades que existia em mqtt.ino (ligação,
+  publicação do estado dos relés E leitura de dados de excedente, tudo no
+  mesmo ficheiro). Agora este serviço trata apenas da ligação/mensagens; os
+  gestores de excedentes que precisem de dados por MQTT (ex.: MqttSurplusManager)
+  registam-se com onTopic().
+
+  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+*/
+#pragma once
+
+#include <Arduino.h>
+#include <functional>
+
+class MqttService {
+public:
+  static void begin();
+  static void loop(); // trata da reconexão periódica
+
+  static bool connected();
+  static void publish(const char *topic, const char *payload, bool retain = false);
+
+  using MessageHandler = std::function<void(const char *topic, const char *payload)>;
+
+  // Subscreve `topic` (se ainda não ligado, fica em fila e subscreve ao ligar)
+  // e chama handler(topic, payload) sempre que chegar uma mensagem completa.
+  static void onTopic(const char *topic, MessageHandler handler);
+};
