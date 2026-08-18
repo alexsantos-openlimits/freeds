@@ -50,6 +50,8 @@ extern "C" {
 #include "DisplayManager.h"
 #include "EnergyTracker.h"
 #include "WebApi.h"
+#include "workingmode.h"
+#include "managers/HttpInverterManager.h"
 
 // ----------------------------------------------------------------------
 // Pinagem de hardware (inalterada face à placa FreeDS original)
@@ -198,6 +200,13 @@ void loop() {
   if (g_surplusManager) {
     g_surplusManager->loop();
     g_loadController.onNewReading(g_surplusManager->reading(), g_surplusManager->isConnected());
+
+    // Modo escravo: outro FreeDS "mestre" pode pedir para desligar este PWM
+    // (ex.: o mestre parou por temperatura ou já não tem excedente).
+    if (ConfigStore::get().surplus.mode == SLAVE_MODE) {
+      auto *slave = static_cast<HttpInverterManager *>(g_surplusManager);
+      g_loadController.setRunning(!slave->masterRequestsPwmDisable());
+    }
   }
 
   g_loadController.update();

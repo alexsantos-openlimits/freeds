@@ -246,6 +246,20 @@ void WebApi::registerApiRoutes() {
                request->send(200, "application/json", buildStatusJson());
              });
 
+  server_.on("/api/temperature/sensors", HTTP_GET, [this](AsyncWebServerRequest *request) {
+    DynamicJsonDocument doc(1024);
+    JsonArray sensors = doc.createNestedArray("sensors");
+    for (uint8_t i = 0; i < temperature_->sensorCount(); i++) {
+      const uint8_t *addr = temperature_->sensorAddress(i);
+      char hex[17];
+      for (uint8_t b = 0; b < 8; b++) sprintf(hex + b * 2, "%02X", addr[b]);
+      sensors.add(hex);
+    }
+    String out;
+    serializeJson(doc, out);
+    request->send(200, "application/json", out);
+  });
+
   server_.on("/api/wifi/scan", HTTP_POST, [this](AsyncWebServerRequest *request) {
     DynamicJsonDocument doc(1024);
     JsonArray networks = doc.createNestedArray("networks");
@@ -292,6 +306,14 @@ void WebApi::registerSystemRoutes() {
   });
 
   server_.on("/api/system/restart", HTTP_POST, [](AsyncWebServerRequest *request) {
+    if (!requireAuth(request)) return;
+    request->send(200);
+    delay(300);
+    ESP.restart();
+  });
+
+  // Alias simples para reiniciar sem repor de fábrica (usado pela SPA).
+  server_.on("/reboot", HTTP_GET, [](AsyncWebServerRequest *request) {
     if (!requireAuth(request)) return;
     request->send(200);
     delay(300);
