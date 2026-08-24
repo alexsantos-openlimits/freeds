@@ -186,6 +186,15 @@ void WebApi::handleConfigSection(AsyncWebServerRequest *request, uint8_t *data, 
   String wrapped = String("{\"") + section + "\":" + body + "}";
   bool ok = ConfigStore::importJson(wrapped);
 
+  // "configured" nunca é enviado pela SPA (só existe para o arranque saber
+  // se já há uma rede definida) - assume-se automaticamente que a rede está
+  // configurada quando é gravado um SSID não vazio, para não ficar presa
+  // em modo ponto de acesso mesmo depois de o utilizador gravar o Wi-Fi.
+  if (ok && strcmp(section, "network") == 0 && strlen(ConfigStore::get().network.ssid1) > 0) {
+    ConfigStore::get().network.configured = true;
+    ConfigStore::save();
+  }
+
   if (!ok) {
     request->send(400, "application/json", "{\"error\":\"json invalido\"}");
     return;
