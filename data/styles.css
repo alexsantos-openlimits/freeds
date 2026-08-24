@@ -553,7 +553,13 @@ input[type=range] { flex: 1 1 auto; accent-color: var(--color-primary); }
 @media (max-width: 520px) {
   .grid, .grid.metrics { grid-template-columns: 1fr 1fr; }
   .stat-card .stat-value { font-size: 22px; }
-  .topbar { padding: 0 12px; }
+  .topbar { padding: 0 12px; gap: 8px; }
+  /* Em telas estreitas não há espaço para o seletor de idioma e o texto das
+     pills de estado ao lado do título - o idioma continua acessível em
+     Configurações > Sistema, e as pills mantêm o ponto de cor. */
+  .lang-switch { display: none; }
+  .status-pill span[data-role="text"] { display: none; }
+  .status-pill { padding: 6px; }
 }
 
 @media (max-width: 380px) {

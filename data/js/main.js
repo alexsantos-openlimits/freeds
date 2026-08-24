@@ -34,7 +34,7 @@ const NAV = [
   { path: "maintenance", label: "nav.system", icon: "tool" },
 ];
 
-const ROUTES = {
+const VIEWS = {
   "dashboard": mountDashboard,
   "settings/network": mountNetwork,
   "settings/mqtt": mountMqtt,
@@ -201,6 +201,12 @@ async function boot() {
     onConnectionChange: (cb) => { connectionListeners.add(cb); return () => connectionListeners.delete(cb); },
     isEventStreamOpen: () => eventStreamOpen,
   };
+
+  // Cada vista espera (container, ctx); o router só passa o container, por
+  // isso o ctx é fechado aqui via closure em vez de ser esquecido.
+  const ROUTES = Object.fromEntries(
+    Object.entries(VIEWS).map(([path, mount]) => [path, (container) => mount(container, ctx)])
+  );
 
   const router = createRouter(ROUTES, {
     defaultPath: "dashboard",
