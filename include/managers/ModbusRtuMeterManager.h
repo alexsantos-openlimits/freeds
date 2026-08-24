@@ -59,7 +59,10 @@ private:
   void tickMustSolar();
 
   void sendRequest(uint8_t functionCode, uint16_t startAddress, uint16_t registerCount);
-  bool receiveReady() const;
+  // Não pode ser const: HardwareSerial::available() não é const neste core
+  // do Arduino-ESP32, e chamá-lo sobre serial_ dentro de um método const
+  // tornaria serial_ implicitamente const, o que não compila (-fpermissive).
+  bool receiveReady();
 
   // Devolve 0 em sucesso; caso contrário, o código de erro (7 = dados
   // insuficientes, 9 = CRC inválido, ou o código de excepção Modbus

@@ -126,7 +126,7 @@ void ModbusRtuMeterManager::sendRequest(uint8_t functionCode, uint16_t startAddr
   serial_.write(frame, sizeof(frame));
 }
 
-bool ModbusRtuMeterManager::receiveReady() const {
+bool ModbusRtuMeterManager::receiveReady() {
   return serial_.available() > 4;
 }
 

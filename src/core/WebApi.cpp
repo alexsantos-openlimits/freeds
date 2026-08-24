@@ -24,12 +24,22 @@ extern "C" {
 
 namespace {
 
+// String::concat(const char*, unsigned int) é protected nalgumas versões do
+// core Arduino-ESP32 (não é garantido ser acessível de fora da classe); esta
+// função constrói a String a partir de um buffer não necessariamente
+// terminado em '\0' sem depender dessa sobrecarga.
+String bytesToString(const char *data, size_t len) {
+  String result;
+  result.reserve(len);
+  for (size_t i = 0; i < len; i++) result += data[i];
+  return result;
+}
+
 String decodeBase64(const char *b64) {
   size_t outLen = 0;
   unsigned char *out = base64_decode((const unsigned char *)b64, strlen(b64), &outLen);
   if (!out) return "";
-  String result;
-  result.concat((const char *)out, outLen);
+  String result = bytesToString((const char *)out, outLen);
   free(out);
   return result;
 }
@@ -171,8 +181,7 @@ String WebApi::buildStatusJson() {
 void WebApi::handleConfigSection(AsyncWebServerRequest *request, uint8_t *data, size_t len, const char *section) {
   if (!requireAuth(request)) return;
 
-  String body;
-  body.concat((const char *)data, len);
+  String body = bytesToString((const char *)data, len);
 
   String wrapped = String("{\"") + section + "\":" + body + "}";
   bool ok = ConfigStore::importJson(wrapped);
@@ -291,8 +300,7 @@ void WebApi::registerSystemRoutes() {
              [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
                if (!requireAuth(request)) return;
                if (index + len != total) return;
-               String body;
-               body.concat((const char *)data, len);
+               String body = bytesToString((const char *)data, len);
                if (!ConfigStore::importJson(body)) {
                  request->send(400, "application/json", "{\"error\":\"json invalido\"}");
                  return;
