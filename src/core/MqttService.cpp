@@ -106,6 +106,14 @@ void configureAndConnect() {
     return;
   }
 
+  // Last Will: se a ligação cair sem um disconnect() ordenado (queda de
+  // energia, Wi-Fi perdido, etc.), o broker publica "offline" por nós -
+  // usado pelo Home Assistant para saber que o dispositivo desapareceu
+  // (ver MqttPublisher, que publica "online" retido depois de ligar).
+  static char willTopic[40];
+  snprintf(willTopic, sizeof(willTopic), "%s/availability", ConfigStore::get().network.hostname);
+  g_client.setWill(willTopic, 1, true, "offline");
+
   g_client.setClientId(ConfigStore::get().network.hostname);
   g_client.setKeepAlive(30);
   g_client.setCredentials(cfg.user, cfg.password);

@@ -208,7 +208,7 @@ void loop() {
     if (!g_networkManager.isConnected()) return; // ainda a tentar ligar (rede 1/rede 2)
     g_networkReady = true;
     MqttService::begin();
-    g_mqttPublisher.begin(&g_loadController, &g_surplusManager, &g_clampSensor);
+    g_mqttPublisher.begin(&g_loadController, &g_surplusManager, &g_clampSensor, &g_temperatureManager);
     recreateSurplusManager();
     g_displayManager.showLogo(WiFi.localIP().toString(), true);
   }
