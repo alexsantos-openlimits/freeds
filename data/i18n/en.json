@@ -131,6 +131,7 @@
     "scan": "Scan networks",
     "scanning": "Scanning networks…",
     "no_networks": "No networks found",
+    "use_selected": "Use selected network",
     "select_network": "Select a detected network",
     "lan_settings": "IP Configuration",
     "hostname": "Device hostname",
@@ -155,7 +156,12 @@
     "relay_topic": "Output Topic",
     "solax_topic": "Solax Topic",
     "meter_topic": "Meter Topic",
-    "soc_topic": "Battery SoC Topic"
+    "soc_topic": "Battery SoC Topic",
+    "status_disabled": "MQTT disabled",
+    "status_connected": "Connected to broker",
+    "status_disconnected": "Not connected to broker",
+    "testing_connection": "Testing connection...",
+    "status_connect_failed": "Could not connect - check the broker, port, user and password"
   },
   "surplus": {
     "title": "Surplus Manager",
@@ -289,6 +295,8 @@
     "logging_section": "Logging",
     "weblog_enabled": "Enable web log",
     "serial_log_enabled": "Enable serial log",
+    "debug_mode": "Debug mode",
+    "debug_mode_hint": "Logs extra connection details (MQTT, Wi-Fi) to the Log page - useful for diagnosing connection issues.",
     "security_section": "Security",
     "admin_password": "Admin password",
     "admin_password_new": "New password",

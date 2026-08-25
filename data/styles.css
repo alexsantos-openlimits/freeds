@@ -266,6 +266,10 @@ img, svg { max-width: 100%; }
   padding: 18px 20px;
 }
 .card + .card { margin-top: 16px; }
+
+/* Em ecrãs largos o mosaico de controlo rápido não precisa de ocupar toda a
+   largura - o seu conteúdo (modo + gauge) cabe bem num cartão mais estreito. */
+#quick-control-card { max-width: 560px; }
 .card-title {
   font-size: 13px;
   font-weight: 700;
@@ -277,6 +281,9 @@ img, svg { max-width: 100%; }
   align-items: center;
   gap: 8px;
 }
+/* Os ícones (icons.js) não têm width/height próprios - sem isto ficam ao
+   tamanho por omissão do browser para SVG (~150px). */
+.card-title svg { width: 16px; height: 16px; flex: 0 0 auto; }
 
 .grid {
   display: grid;
@@ -328,8 +335,11 @@ img, svg { max-width: 100%; }
 }
 
 /* ---------- Gauge ---------- */
-.gauge-wrap { display: flex; align-items: center; gap: 16px; }
-.gauge-wrap svg { flex: 0 0 auto; }
+/* .gauge-wrap é a própria tag <svg> da gauge (ver components/gauge.js) - não
+   um contentor à volta de outros elementos, por isso não deve levar
+   display:flex (isso ignorava os atributos width/height do SVG e fazia-o
+   esticar para ocupar todo o espaço disponível no cartão). */
+.gauge-wrap { display: block; }
 .gauge-center-label {
   font-size: 20px; font-weight: 700; fill: var(--color-text);
 }
@@ -337,16 +347,17 @@ img, svg { max-width: 100%; }
 .gauge-value { fill: none; stroke-linecap: round; transition: stroke-dasharray var(--transition); }
 
 /* ---------- Relays ---------- */
-.relay-list { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.relay-list { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .relay-card {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 12px 14px;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  gap: 10px;
   background: var(--color-surface-alt);
 }
+.relay-top { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .relay-icon {
   width: 38px; height: 38px; border-radius: 10px; flex: 0 0 auto;
   display: flex; align-items: center; justify-content: center;
@@ -355,11 +366,11 @@ img, svg { max-width: 100%; }
 .relay-icon.on { background: var(--color-primary-soft); color: var(--color-primary-dark); border-color: transparent; }
 .relay-icon svg { width: 18px; height: 18px; }
 .relay-body { flex: 1 1 auto; min-width: 0; }
-.relay-name { font-weight: 600; font-size: 14px; }
+.relay-name { font-weight: 600; font-size: 14px; white-space: nowrap; }
 .relay-state { font-size: 12.5px; color: var(--color-text-muted); }
-.relay-toggle-group { display: flex; border: 1px solid var(--color-border); border-radius: 999px; overflow: hidden; flex: 0 0 auto; }
+.relay-toggle-group { display: flex; border: 1px solid var(--color-border); border-radius: 999px; overflow: hidden; align-self: stretch; }
 .relay-toggle-group button {
-  border: none; background: transparent; padding: 5px 9px; font-size: 11.5px; font-weight: 700;
+  flex: 1 1 0; border: none; background: transparent; padding: 6px 4px; font-size: 11.5px; font-weight: 700;
   color: var(--color-text-muted); cursor: pointer; text-transform: uppercase; letter-spacing: 0.03em;
 }
 .relay-toggle-group button.active { background: var(--color-primary); color: #fff; }

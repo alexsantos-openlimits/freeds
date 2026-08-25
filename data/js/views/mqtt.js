@@ -1,5 +1,6 @@
 import { section, row, textInput, numberInput, switchInput, readVal, handleSave } from "../components/form.js";
 import { Icon } from "../components/icons.js";
+import { toast } from "../components/toast.js";
 
 export default async function mount(container, ctx) {
   const { i18n, api } = ctx;
@@ -7,9 +8,29 @@ export default async function mount(container, ctx) {
 
   container.innerHTML = `
     <div class="view-header"><h2 data-i18n="mqtt.title"></h2></div>
+    <div class="card" id="mqtt-status-card" style="margin-bottom:16px;"></div>
     <div class="card"><div id="mqtt-form"><div class="empty-note" data-i18n="common.loading"></div></div></div>
   `;
   i18n.applyTo(container);
+
+  async function refreshStatus() {
+    const el = container.querySelector("#mqtt-status-card");
+    if (!el) return;
+    try {
+      const status = await api.getStatus();
+      const m = status.mqtt || {};
+      if (!m.enabled) {
+        el.innerHTML = `<span class="status-pill">${i18n.t("mqtt.status_disabled")}</span>`;
+      } else if (m.connected) {
+        el.innerHTML = `<span class="status-pill ok"><span class="dot"></span> ${i18n.t("mqtt.status_connected")}</span>`;
+      } else {
+        el.innerHTML = `<span class="status-pill bad"><span class="dot"></span> ${i18n.t("mqtt.status_disconnected")}</span>`;
+      }
+    } catch {
+      /* mantém o último estado conhecido */
+    }
+  }
+  refreshStatus();
 
   let cfg;
   try {
@@ -61,6 +82,21 @@ export default async function mount(container, ctx) {
         socTopic: readVal(form, "socTopic"),
       };
       await handleSave(() => api.postMqttConfig(body), i18n);
+
+      if (body.enabled) {
+        toast(i18n.t("mqtt.testing_connection"), "info");
+        setTimeout(async () => {
+          await refreshStatus();
+          try {
+            const status = await api.getStatus();
+            const m = status.mqtt || {};
+            toast(m.connected ? i18n.t("mqtt.status_connected") : i18n.t("mqtt.status_connect_failed"),
+                  m.connected ? "success" : "error");
+          } catch { /* ignore */ }
+        }, 2500);
+      } else {
+        refreshStatus();
+      }
     });
   }
 

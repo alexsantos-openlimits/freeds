@@ -37,6 +37,12 @@ public:
 
   void begin(const LoadControllerPins &pins);
 
+  // A chamar depois de gravar a configuração de "Controlo de Carga" (PID,
+  // frequência do PWM, dimmer económico) ou "Gestor de Excedentes" (sinal
+  // da rede) - sem isto, essas alterações só tinham efeito depois de
+  // reiniciar o dispositivo.
+  void reloadTunables();
+
   // A chamar sempre que uma nova leitura de potência estiver disponível.
   void onNewReading(const PowerReading &reading, bool sourceConnected);
 

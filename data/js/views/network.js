@@ -2,6 +2,13 @@ import { section, row, textInput, switchInput, readVal, handleSave } from "../co
 import { Icon } from "../components/icons.js";
 import { toast } from "../components/toast.js";
 
+function WifiQuality(rssi) {
+  if (rssi === undefined || rssi === null) return "?";
+  if (rssi <= -100) return 0;
+  if (rssi >= -50) return 100;
+  return 2 * (rssi + 100);
+}
+
 export default async function mount(container, ctx) {
   const { i18n, api } = ctx;
   ctx.setTitle("network.title");
@@ -35,7 +42,12 @@ export default async function mount(container, ctx) {
           <label class="field-label"></label>
           <div>
             <button type="button" class="btn btn-secondary" id="scan-btn">${Icon.wifi()} <span data-i18n="network.scan"></span></button>
-            <div class="wifi-list hidden" id="wifi-list" style="margin-top:10px;"></div>
+            <div class="wifi-scan-result hidden" id="wifi-scan-result" style="margin-top:10px;">
+              <select id="wifi-select" size="6" style="width:100%;max-width:420px;"></select>
+              <div class="btn-row" style="margin-top:8px;">
+                <button type="button" class="btn btn-secondary" id="wifi-use-btn" data-i18n="network.use_selected"></button>
+              </div>
+            </div>
           </div>
         </div>
       `)}
@@ -65,30 +77,39 @@ export default async function mount(container, ctx) {
     });
 
     form.querySelector("#scan-btn").addEventListener("click", async () => {
-      const list = form.querySelector("#wifi-list");
-      list.classList.remove("hidden");
-      list.innerHTML = `<div class="wifi-item">${i18n.t("network.scanning")}</div>`;
+      const wrap = form.querySelector("#wifi-scan-result");
+      const select = form.querySelector("#wifi-select");
+      wrap.classList.remove("hidden");
+      select.innerHTML = `<option disabled selected>${i18n.t("network.scanning")}</option>`;
       try {
         const res = await api.scanWifi();
         const nets = (res && res.networks) || [];
-        if (!nets.length) {
-          list.innerHTML = `<div class="wifi-item">${i18n.t("network.no_networks")}</div>`;
+
+        // Vários pontos de acesso da mesma rede (mesh/repetidor) reportam o
+        // mesmo SSID várias vezes - mantém só a ocorrência com melhor sinal.
+        const bySsid = new Map();
+        for (const n of nets) {
+          if (!n.ssid) continue;
+          const prev = bySsid.get(n.ssid);
+          if (!prev || (n.rssi ?? -999) > (prev.rssi ?? -999)) bySsid.set(n.ssid, n);
+        }
+        const unique = [...bySsid.values()].sort((a, b) => (b.rssi ?? -999) - (a.rssi ?? -999));
+
+        if (!unique.length) {
+          select.innerHTML = `<option disabled selected>${i18n.t("network.no_networks")}</option>`;
           return;
         }
-        nets.sort((a, b) => (b.rssi || -999) - (a.rssi || -999));
-        list.innerHTML = nets.map((n) => `
-          <div class="wifi-item" data-ssid="${n.ssid}">
-            <span>${Icon.wifi()} ${n.ssid}</span>
-            <span class="rssi">${n.rssi ?? ""} dBm</span>
-          </div>`).join("");
-        list.querySelectorAll(".wifi-item[data-ssid]").forEach((item) => {
-          item.addEventListener("click", () => {
-            form.querySelector(`#${lastSsidFocus}`).value = item.dataset.ssid;
-          });
-        });
+        select.innerHTML = unique.map((n) =>
+          `<option value="${n.ssid}">${n.ssid} · ${n.rssi ?? "?"} dBm (${WifiQuality(n.rssi)}%)</option>`
+        ).join("");
       } catch {
-        list.innerHTML = `<div class="wifi-item">${i18n.t("common.error")}</div>`;
+        select.innerHTML = `<option disabled selected>${i18n.t("common.error")}</option>`;
       }
+    });
+
+    form.querySelector("#wifi-use-btn").addEventListener("click", () => {
+      const select = form.querySelector("#wifi-select");
+      if (select.value) form.querySelector(`#${lastSsidFocus}`).value = select.value;
     });
 
     form.querySelector("#save-btn").addEventListener("click", async () => {

@@ -12,6 +12,7 @@
 #include "AppConfig.h"
 #include "Logger.h"
 #include "EnergyTracker.h"
+#include "MqttService.h"
 
 #include <ArduinoJson.h>
 #include <SPIFFS.h>
@@ -76,8 +77,13 @@ void WebApi::begin(LoadController *load, TemperatureManager *temperature, Networ
   registerApiRoutes();
   registerSystemRoutes();
 
-  server_.serveStatic("/i18n/", SPIFFS, "/i18n/");
-  server_.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
+  // "no-store": os ficheiros da SPA são pequenos e mudam a cada atualização
+  // de firmware - preferimos sempre ir buscar a versão atual em vez de
+  // arriscar o browser servir HTML/JS antigo da cache (o ETag por omissão
+  // do ESPAsyncWebServer usa só o tamanho do ficheiro, que pode coincidir
+  // entre versões e disfarçar uma atualização).
+  server_.serveStatic("/i18n/", SPIFFS, "/i18n/").setCacheControl("no-store, max-age=0");
+  server_.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html").setCacheControl("no-store, max-age=0");
   server_.onNotFound([](AsyncWebServerRequest *request) { request->send(404, "text/plain", "Not found"); });
 
   server_.begin();
@@ -154,6 +160,10 @@ String WebApi::buildStatusJson() {
   wifi["rssi"] = WiFi.RSSI();
   wifi["ip"] = WiFi.localIP().toString();
 
+  JsonObject mqtt = doc.createNestedObject("mqtt");
+  mqtt["enabled"] = MqttService::enabled();
+  mqtt["connected"] = MqttService::connected();
+
   doc["sourceConnected"] = sm ? sm->isConnected() : false;
   doc["dataFault"] = load_->hasDataFault();
   doc["uptimeSeconds"] = millis() / 1000;
@@ -200,8 +210,17 @@ void WebApi::handleConfigSection(AsyncWebServerRequest *request, uint8_t *data, 
     return;
   }
 
-  if (strcmp(section, "surplus") == 0 && onSurplusModeChanged_) {
-    onSurplusModeChanged_();
+  // Aplica a nova configuração de imediato, sem exigir reiniciar. A rede
+  // (Wi-Fi/IP) é a única secção que continua a exigir reiniciar - trocar de
+  // rede a meio de um pedido HTTP em curso arriscaria deixar o próprio
+  // pedido de gravação sem resposta.
+  if (strcmp(section, "surplus") == 0) {
+    if (onSurplusModeChanged_) onSurplusModeChanged_();
+    load_->reloadTunables(); // o sinal da rede (changeGridSign) também vive aqui
+  } else if (strcmp(section, "load") == 0) {
+    load_->reloadTunables();
+  } else if (strcmp(section, "mqtt") == 0) {
+    MqttService::reload();
   }
 
   request->send(200, "application/json", ConfigStore::exportJson());

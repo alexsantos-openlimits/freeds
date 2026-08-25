@@ -121,10 +121,12 @@ export default async function mount(container, ctx) {
   function relayCardHtml(i, r) {
     return `
       <div class="relay-card" data-relay="${i}">
-        <div class="relay-icon ${r.on ? "on" : ""}" data-role="icon">${Icon.plug()}</div>
-        <div class="relay-body">
-          <div class="relay-name">${i18n.t("dashboard.relay")} ${i + 1}</div>
-          <div class="relay-state" data-role="state"></div>
+        <div class="relay-top">
+          <div class="relay-icon ${r.on ? "on" : ""}" data-role="icon">${Icon.plug()}</div>
+          <div class="relay-body">
+            <div class="relay-name">${i18n.t("dashboard.relay")} ${i + 1}</div>
+            <div class="relay-state" data-role="state"></div>
+          </div>
         </div>
         <div class="relay-toggle-group" data-role="toggle">
           <button type="button" data-mode="auto" data-i18n="dashboard.relay_auto"></button>

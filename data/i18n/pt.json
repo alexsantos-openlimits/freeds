@@ -131,6 +131,7 @@
     "scan": "Procurar redes",
     "scanning": "A procurar redes…",
     "no_networks": "Nenhuma rede encontrada",
+    "use_selected": "Usar rede selecionada",
     "select_network": "Selecionar rede detetada",
     "lan_settings": "Configuração de IP",
     "hostname": "Nome do dispositivo",
@@ -155,7 +156,12 @@
     "relay_topic": "Tópico da Saída",
     "solax_topic": "Tópico Solax",
     "meter_topic": "Tópico do Medidor",
-    "soc_topic": "Tópico do SoC da Bateria"
+    "soc_topic": "Tópico do SoC da Bateria",
+    "status_disabled": "MQTT desativado",
+    "status_connected": "Ligado ao broker",
+    "status_disconnected": "Não ligado ao broker",
+    "testing_connection": "A testar a ligação...",
+    "status_connect_failed": "Não foi possível ligar - verifica o servidor, porta, utilizador e palavra-passe"
   },
   "surplus": {
     "title": "Gestor de Excedentes",
@@ -289,6 +295,8 @@
     "logging_section": "Registo",
     "weblog_enabled": "Ativar registo web",
     "serial_log_enabled": "Ativar registo na porta série",
+    "debug_mode": "Modo de depuração",
+    "debug_mode_hint": "Regista detalhes extra de ligação (MQTT, Wi-Fi) no Registo - útil para diagnosticar problemas de ligação.",
     "security_section": "Segurança",
     "admin_password": "Palavra-passe de administração",
     "admin_password_new": "Nova palavra-passe",

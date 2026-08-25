@@ -50,6 +50,7 @@ extern "C" {
 #include "DisplayManager.h"
 #include "EnergyTracker.h"
 #include "CurrentClampSensor.h"
+#include "MqttPublisher.h"
 #include "WebApi.h"
 #include "workingmode.h"
 #include "managers/HttpInverterManager.h"
@@ -74,6 +75,7 @@ TemperatureManager g_temperatureManager;
 DisplayManager g_displayManager;
 EnergyTracker g_energyTracker;
 CurrentClampSensor g_clampSensor;
+MqttPublisher g_mqttPublisher;
 WebApi g_webApi;
 
 SurplusManager *g_surplusManager = nullptr;
@@ -93,6 +95,9 @@ struct ButtonState {
 } g_button;
 
 void recreateSurplusManager() {
+  // Evita handlers MQTT presos a um "this" que está prestes a ser destruído
+  // (ex.: MqttSurplusManager regista lambdas com [this] em begin()).
+  MqttService::clearTopics();
   delete g_surplusManager;
   g_surplusManager = createSurplusManager();
   if (g_surplusManager) g_surplusManager->begin();
@@ -180,13 +185,15 @@ void setup() {
   if (g_networkManager.isAccessPointMode()) {
     g_displayManager.showLogo("LIGUE-SE AO SSID:\nFreeDS\n192.168.4.1", false);
   } else {
-    MqttService::begin();
-    recreateSurplusManager();
-    g_displayManager.showLogo(WiFi.localIP().toString(), true);
+    // A ligação em si é assíncrona (ver NetworkManager: tenta a rede 1, depois
+    // a rede 2, só depois cai em modo AP) - o resto da inicialização só
+    // arranca quando o loop() confirmar que já há ligação (ver g_networkReady).
+    g_displayManager.showLogo("A ligar...", false);
   }
 }
 
 unsigned long g_lastSlowLoopMs = 0;
+bool g_networkReady = false;
 
 void loop() {
   timerWrite(g_watchdogTimer, 0); // alimenta o watchdog
@@ -197,7 +204,17 @@ void loop() {
     return; // só o portal de configuração está ativo
   }
 
+  if (!g_networkReady) {
+    if (!g_networkManager.isConnected()) return; // ainda a tentar ligar (rede 1/rede 2)
+    g_networkReady = true;
+    MqttService::begin();
+    g_mqttPublisher.begin(&g_loadController, &g_surplusManager, &g_clampSensor);
+    recreateSurplusManager();
+    g_displayManager.showLogo(WiFi.localIP().toString(), true);
+  }
+
   MqttService::loop();
+  g_mqttPublisher.loop();
   g_webApi.loop();
 
   if (g_surplusManager) {

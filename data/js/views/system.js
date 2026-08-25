@@ -55,6 +55,7 @@ export default async function mount(container, ctx) {
       ${section("system.logging_section", i18n, `
         ${row({ i18n, labelKey: "system.weblog_enabled", controlHtml: switchInput({ id: "weblogEnabled", checked: cfg.weblogEnabled, i18n }) })}
         ${row({ i18n, labelKey: "system.serial_log_enabled", controlHtml: switchInput({ id: "serialLogEnabled", checked: cfg.serialLogEnabled, i18n }) })}
+        ${row({ i18n, labelKey: "system.debug_mode", controlHtml: switchInput({ id: "debugMode", checked: (cfg.debugFlags ?? 0) & 1, i18n }), hintKey: "system.debug_mode_hint" })}
       `)}
       ${section("system.security_section", i18n, `
         ${row({ i18n, labelKey: "system.admin_password_new", controlHtml: textInput({ id: "newPassword", type: "password", maxlength: 32 }) })}
@@ -97,6 +98,7 @@ export default async function mount(container, ctx) {
         domoticzIdx: [readVal(form, "domoticzIdx0"), readVal(form, "domoticzIdx1"), readVal(form, "domoticzIdx2")],
         weblogEnabled: readVal(form, "weblogEnabled"),
         serialLogEnabled: readVal(form, "serialLogEnabled"),
+        debugFlags: readVal(form, "debugMode") ? 1 : 0,
       };
       if (newPass) body.adminPasswordB64 = b64EncodeUtf8(newPass);
       await handleSave(() => api.postSystemConfig(body), i18n);

@@ -44,6 +44,23 @@ void LoadController::begin(const LoadControllerPins &pins) {
   running_ = true;
 }
 
+void LoadController::reloadTunables() {
+  const LoadControlConfig &load = ConfigStore::get().load;
+
+  ledcSetup(pins_.ledcChannel, (double)load.pwmFrequencyHz / 10.0, 10);
+  load.dimmerLowCost ? pid_.SetOutputLimits(209, load.maxPwmLowCost) : pid_.SetOutputLimits(0, 1023);
+  pid_.SetTunings(load.pid.kp, load.pid.ki, load.pid.kd, PID::P_ON_M);
+  pid_.SetControllerDirection(ConfigStore::get().surplus.changeGridSign ? PID::DIRECT : PID::REVERSE);
+
+  if (!load.pwmEnabled) {
+    setWorkingMode(LoadWorkingMode::Off);
+  } else {
+    setWorkingMode(load.manualMode ? LoadWorkingMode::Manual : LoadWorkingMode::Auto);
+  }
+
+  Logger::info("LoadController: configuracao de controlo de carga recarregada\n");
+}
+
 void LoadController::onNewReading(const PowerReading &reading, bool sourceConnected) {
   reading_ = reading;
   lastReadingMs_ = millis();
