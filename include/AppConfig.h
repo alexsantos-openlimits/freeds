@@ -3,9 +3,11 @@
 
   Substitui a antiga struct CONFIG monolítica (guardada em bruto na EEPROM,
   com uma escada de migrações manuais por versão) por uma configuração
-  organizada em secções, serializada em JSON e guardada em "/config.json"
-  no sistema de ficheiros interno. Campos novos assumem sempre um valor
-  por omissão sensato, por isso não é necessária nenhuma migração manual.
+  organizada em secções, serializada em JSON e guardada na NVS (partição de
+  flash própria, independente do SPIFFS onde vive a interface web - por isso
+  sobrevive a um "Upload Filesystem Image"). Campos novos assumem sempre um
+  valor por omissão sensato, por isso não é necessária nenhuma migração
+  manual.
 */
 #pragma once
 
@@ -148,14 +150,15 @@ struct AppConfig {
   EnergyTotals energy;
 };
 
-// Guarda/lê a AppConfig em "/config.json" (SPIFFS) e mantém uma cópia em
-// memória acessível globalmente através de ConfigStore::get().
+// Guarda/lê a AppConfig na NVS e mantém uma cópia em memória acessível
+// globalmente através de ConfigStore::get().
 class ConfigStore {
 public:
   static AppConfig &get();
 
-  // Tenta carregar "/config.json"; se não existir ou estiver corrompido,
-  // aplica valores por omissão e devolve false.
+  // Tenta carregar a configuração guardada na NVS (com migração automática,
+  // uma única vez, a partir do antigo "/config.json" em SPIFFS se existir);
+  // se não houver nenhuma, aplica valores por omissão e devolve false.
   static bool begin();
 
   static void save();

@@ -1,15 +1,27 @@
 /*
-  ConfigStore.cpp - Persistência da configuração em "/config.json" (SPIFFS)
+  ConfigStore.cpp - Persistência da configuração na NVS (partição própria,
+  separada da partição SPIFFS onde vive a interface web).
+
+  Guardar isto no SPIFFS, como acontecia antes, tinha um problema: o comando
+  "Upload Filesystem Image" apaga a partição SPIFFS por completo e reescreve-a
+  só com o conteúdo de data/ - a configuração perdia-se sempre que se
+  atualizava a interface web. A NVS é uma partição de flash dedicada e
+  independente (a mesma onde o ESP32 guarda, por exemplo, credenciais Wi-Fi),
+  por isso sobrevive a esse passo.
 */
 #include "AppConfig.h"
 #include "Logger.h"
 
 #include <ArduinoJson.h>
+#include <Preferences.h>
 #include <SPIFFS.h>
 #include <WiFi.h>
 
-static const char *CONFIG_PATH = "/config.json";
+static const char *CONFIG_PATH = "/config.json"; // caminho antigo (SPIFFS) - só para migração
+static const char *PREFS_NAMESPACE = "lusolcfg";
+static const char *PREFS_KEY = "cfg";
 
+static Preferences g_prefs;
 static AppConfig g_config;
 
 AppConfig &ConfigStore::get() { return g_config; }
@@ -318,29 +330,47 @@ void fromJson(const JsonDocument &doc, AppConfig &cfg) {
 
 bool ConfigStore::begin() {
   applyDefaults(g_config);
+  g_prefs.begin(PREFS_NAMESPACE, false);
 
-  if (!SPIFFS.exists(CONFIG_PATH)) {
-    Logger::info("Config: /config.json não encontrado, a usar valores por omissão\n");
+  DynamicJsonDocument doc(6144);
+  bool loaded = false;
+
+  size_t len = g_prefs.getBytesLength(PREFS_KEY);
+  if (len > 0) {
+    char *buf = new char[len + 1];
+    g_prefs.getBytes(PREFS_KEY, buf, len);
+    buf[len] = '\0';
+    DeserializationError err = deserializeJson(doc, buf, len);
+    delete[] buf;
+    if (!err) {
+      loaded = true;
+    } else {
+      Logger::info("Config: JSON invalido na NVS (%s)\n", err.c_str());
+    }
+  } else if (SPIFFS.exists(CONFIG_PATH)) {
+    // Migração única de versões antigas, que guardavam a configuração no
+    // SPIFFS (perdida sempre que se gravava um novo "Upload Filesystem
+    // Image") - a partir daqui a configuração passa a viver só na NVS.
+    File f = SPIFFS.open(CONFIG_PATH, FILE_READ);
+    if (f) {
+      DeserializationError err = deserializeJson(doc, f);
+      f.close();
+      if (!err) {
+        loaded = true;
+        SPIFFS.remove(CONFIG_PATH);
+        Logger::info("Config: migrada do SPIFFS para a NVS\n");
+      }
+    }
+  }
+
+  if (!loaded) {
+    Logger::info("Config: nenhuma configuração guardada, a usar valores por omissão\n");
     save();
     return false;
   }
 
-  File f = SPIFFS.open(CONFIG_PATH, FILE_READ);
-  if (!f) {
-    Logger::info("Config: erro ao abrir /config.json\n");
-    return false;
-  }
-
-  DynamicJsonDocument doc(6144);
-  DeserializationError err = deserializeJson(doc, f);
-  f.close();
-
-  if (err) {
-    Logger::info("Config: JSON inválido (%s), a usar valores por omissão\n", err.c_str());
-    return false;
-  }
-
   fromJson(doc, g_config);
+  save(); // garante que a NVS fica com a versão carregada (inclui migração)
   Logger::info("Config: configuração carregada (schema v%u)\n", g_config.schemaVersion);
   return true;
 }
@@ -349,13 +379,9 @@ void ConfigStore::save() {
   DynamicJsonDocument doc(6144);
   toJson(g_config, doc);
 
-  File f = SPIFFS.open(CONFIG_PATH, FILE_WRITE);
-  if (!f) {
-    Logger::info("Config: erro ao guardar /config.json\n");
-    return;
-  }
-  serializeJson(doc, f);
-  f.close();
+  String out;
+  serializeJson(doc, out);
+  g_prefs.putBytes(PREFS_KEY, out.c_str(), out.length());
 }
 
 void ConfigStore::resetToDefaults() {
