@@ -49,7 +49,7 @@ void MqttPublisher::addCommonFields(JsonObject &doc, const char *objectId) {
   JsonArray ids = dev.createNestedArray("identifiers");
   ids.add(hostname_);
   dev["name"] = hostname_;
-  dev["manufacturer"] = "FreeDS";
+  dev["manufacturer"] = "Lusol";
   dev["model"] = "Gestor de excedentes fotovoltaicos";
 }
 

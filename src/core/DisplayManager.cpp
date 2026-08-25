@@ -27,7 +27,7 @@ void DisplayManager::begin(SSD1306Wire *display, LoadController *loadController,
 
 void DisplayManager::showLogo(const String &text, bool blocking) {
   display_->clear();
-  display_->drawFastImage(0, 0, 128, 64, FreeDS);
+  display_->drawFastImage(0, 0, 128, 64, Lusol);
   display_->setTextAlignment(TEXT_ALIGN_CENTER);
   display_->setFont(ArialMT_Plain_10);
   int8_t nl = text.indexOf('\n');
@@ -199,7 +199,7 @@ void DisplayManager::drawBuildInfo() {
   display_->clear();
   display_->setFont(ArialMT_Plain_24);
   display_->setTextAlignment(TEXT_ALIGN_CENTER);
-  display_->drawString(64, 0, "FreeDS");
+  display_->drawString(64, 0, "Lusol");
   display_->setFont(ArialMT_Plain_10);
   display_->drawString(64, 25, L("Gestor de excedentes", "Surplus manager"));
   display_->drawString(64, 40, L("Compilacao:", "Build:"));

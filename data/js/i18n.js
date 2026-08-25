@@ -1,9 +1,9 @@
-// FreeDS — minimal i18n engine. No dependencies.
+// Lusol — minimal i18n engine. No dependencies.
 // Dictionaries live in /i18n/<lang>.json as nested objects; keys are
 // referenced with dot notation, e.g. "dashboard.solar_power".
 
 const SUPPORTED = ["pt", "en"];
-const STORAGE_KEY = "freeds.lang";
+const STORAGE_KEY = "lusol.lang";
 
 let currentLang = "pt";
 let dict = {};

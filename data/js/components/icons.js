@@ -1,4 +1,4 @@
-// FreeDS — tiny inline-SVG icon set (no external icon font/library).
+// Lusol — tiny inline-SVG icon set (no external icon font/library).
 // Each function returns a ready-to-insert <svg> markup string.
 
 function svg(inner, extra = "") {

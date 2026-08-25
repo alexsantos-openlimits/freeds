@@ -21,7 +21,7 @@ double CurrentClampSensor::readIrms(unsigned int numberOfSamples) {
     if (reading < 1 || reading > 4095) reading = 0;
 
     // Polinómio de calibração específico do sensor SCT-013 + resistência de
-    // carga usados na placa FreeDS original - copiado tal e qual, não é um
+    // carga usados na placa Lusol original - copiado tal e qual, não é um
     // valor arbitrário para "melhorar".
     sampleI = -0.000000000000016 * pow((double)reading, 4) + 0.000000000118171 * pow((double)reading, 3) -
               0.000000301211691 * pow((double)reading, 2) + 0.001109019271794 * (double)reading + 0.034143524634089;

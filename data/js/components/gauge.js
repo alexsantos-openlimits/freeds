@@ -1,4 +1,4 @@
-// FreeDS — minimal circular gauge, drawn with plain SVG (no canvas libs).
+// Lusol — minimal circular gauge, drawn with plain SVG (no canvas libs).
 
 export function gaugeSvg({ percent = 0, size = 84, stroke = 9, color = "var(--color-primary)", label = "" }) {
   const p = Math.max(0, Math.min(100, Number(percent) || 0));

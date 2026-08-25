@@ -1,7 +1,7 @@
 /**********************************************************************************************
  * Arduino PID Library - Version 1.2.1
  * by Brett Beauregard <br3ttb@gmail.com> brettbeauregard.com
- * code modifications for FreeDS by Pablo Zerón
+ * code modifications for Lusol
  *
  * This Library is licensed under the MIT License
  **********************************************************************************************/

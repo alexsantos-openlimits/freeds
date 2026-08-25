@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="FreeDS - Derivador de energia solar excedente">
-<title>FreeDS</title>
+<meta name="description" content="Lusol - Derivador de energia solar excedente">
+<title>Lusol</title>
 <link rel="icon" href="favicon.ico">
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -21,7 +21,7 @@
         </svg>
       </span>
       <div class="brand-text">
-        <strong data-i18n="app.title"></strong>
+        <strong class="brand-wordmark">LUS<span class="brand-o">O</span>L</strong>
         <span data-i18n="app.subtitle"></span>
       </div>
     </div>
@@ -36,14 +36,15 @@
       <button class="hamburger" id="hamburger" data-i18n-aria-label="common.menu" aria-label="Menu">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
       </button>
-      <h1 id="page-title">FreeDS</h1>
+      <h1 id="page-title">Lusol</h1>
       <div class="topbar-spacer"></div>
       <div class="lang-switch" id="lang-switch">
         <button type="button" data-lang="pt">PT</button>
         <button type="button" data-lang="en">EN</button>
       </div>
       <div class="status-pill" id="wifi-pill"><span class="dot"></span><span data-role="text">Wi-Fi</span></div>
-      <div class="status-pill" id="source-pill"><span class="dot"></span><span data-role="text">—</span></div>
+      <div class="status-pill" id="mqtt-pill"><span class="dot"></span><span data-role="text">MQTT</span></div>
+      <div class="status-pill" id="source-pill"><span class="dot"></span><span data-role="text">DDSU</span></div>
     </header>
 
     <main class="view" id="view-root">

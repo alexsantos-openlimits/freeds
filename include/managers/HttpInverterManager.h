@@ -2,7 +2,7 @@
   HttpInverterManager.h - Gestor de excedentes para inversores/contadores
   falados por série (Solax V2 via módulo ESP-01) ou por HTTP direto (Solax
   V2 local/V1, Wibeee, Shelly EM, Fronius API e o modo "escravo" que lê os
-  dados de outro FreeDS "mestre").
+  dados de outro Lusol "mestre").
 
   Substitui:
     - inverter.ino          (readESP01()/parseJson() - Solax V2 por série)
@@ -11,7 +11,7 @@
                               Fronius)
     - wibeee.ino            (parseWibeee())
     - shelly.ino            (parseShellyEM())
-    - master_freeds.ino     (parseMasterFreeDs())
+    - master_lusol.ino     (parseMasterFreeDs())
 
   O modo é escolhido em runtime a partir de ConfigStore::get().surplus.mode;
   esta classe cobre exatamente os modos HTTP_API que não usam Modbus/MQTT/UDP:
@@ -25,19 +25,12 @@
     WIBEEE         (24) - HTTP GET /en/status.xml (XML/texto)
     SHELLY_EM      (25) - HTTP GET /emeter/0 e /emeter/1 alternados (JSON)
     FRONIUS_API    (26) - HTTP GET /solar_api/v1/GetPowerFlowRealtimeData.fcgi
-    SLAVE_MODE     (27) - HTTP GET /masterdata (JSON de outro FreeDS mestre)
+    SLAVE_MODE     (27) - HTTP GET /masterdata (JSON de outro Lusol mestre)
 
   Os pedidos HTTP usam um AsyncClient (AsyncTCP) em modo "cru" tal como o
   firmware original (sem HTTPClient bloqueante): o pedido é escrito à mão
   como texto HTTP/1.1 e a resposta é acumulada em buffer nos callbacks
   onData()/onDisconnect(), exatamente como em asyncHttpClient.ino.
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
 */
 #pragma once
 
@@ -56,7 +49,7 @@ public:
   const char *name() const override { return "HTTP/Serie Inversor"; }
 
   // Só tem significado em SLAVE_MODE: true quando a última mensagem do
-  // FreeDS mestre reportou uma percentagem de PWM (ou paragem por
+  // Lusol mestre reportou uma percentagem de PWM (ou paragem por
   // temperatura) abaixo do limiar configurado em surplus.pwmSlaveOnPercent -
   // equivalente ao antigo "slave.masterPwmValue >= config.pwmSlaveOn" (aqui
   // invertido: true significa "o mestre pede para desligar o PWM deste
@@ -93,7 +86,7 @@ private:
   static String midString(const String &src, const char *startTag, const char *endTag);
 
   // Réplica do defineWebMonitorFields() original: para um dado "wversion"
-  // reportado por um FreeDS mestre em SLAVE_MODE, indica que campos vêm
+  // reportado por um Lusol mestre em SLAVE_MODE, indica que campos vêm
   // realmente preenchidos na mensagem "/masterdata". Necessário para não
   // confundir um campo ausente (0 por omissão no JSON) com uma leitura
   // válida de 0 W.

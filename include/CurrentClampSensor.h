@@ -7,13 +7,6 @@
   potência a partir da curva de um dimmer de fase (seno ao quadrado) e da
   potência nominal configurada da carga (attachedLoadWatts) - tal como no
   firmware original.
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
 */
 #pragma once
 

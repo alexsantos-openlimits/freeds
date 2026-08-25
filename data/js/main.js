@@ -53,6 +53,7 @@ async function boot() {
   const hamburger = document.getElementById("hamburger");
   const pageTitle = document.getElementById("page-title");
   const wifiPill = document.getElementById("wifi-pill");
+  const mqttPill = document.getElementById("mqtt-pill");
   const sourcePill = document.getElementById("source-pill");
   const uptimeFooter = document.getElementById("uptime-footer");
   const langSwitch = document.getElementById("lang-switch");
@@ -107,6 +108,15 @@ async function boot() {
     sourcePill.querySelector("[data-role='text']").textContent = sourceOk
       ? I18n.t("dashboard.source_connected")
       : I18n.t("dashboard.source_fault");
+
+    const mqtt = status.mqtt || {};
+    mqttPill.classList.toggle("ok", !!mqtt.connected);
+    mqttPill.classList.toggle("bad", !!mqtt.enabled && !mqtt.connected);
+    mqttPill.querySelector("[data-role='text']").textContent = !mqtt.enabled
+      ? I18n.t("dashboard.mqtt_disabled")
+      : mqtt.connected
+        ? I18n.t("dashboard.mqtt_connected")
+        : I18n.t("dashboard.mqtt_fault");
 
     uptimeFooter.textContent = `${I18n.t("dashboard.uptime")}: ${fmtUptime(status.uptimeSeconds)}`;
   }

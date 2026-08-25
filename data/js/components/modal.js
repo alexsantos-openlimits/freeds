@@ -1,4 +1,4 @@
-// FreeDS — minimal confirmation modal, no dependencies.
+// Lusol — minimal confirmation modal, no dependencies.
 import { Icon } from "./icons.js";
 import { I18n } from "../i18n.js";
 

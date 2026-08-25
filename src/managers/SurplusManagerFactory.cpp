@@ -6,13 +6,6 @@
   defineWebMonitorFields() no firmware original por um único ponto de
   decisão. Chamado no arranque e sempre que o utilizador grava uma nova
   configuração de gestor de excedentes (ver WebApi::onSurplusModeChanged).
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
 */
 #include "AppConfig.h"
 #include "SurplusManager.h"

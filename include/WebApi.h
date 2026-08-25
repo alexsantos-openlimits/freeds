@@ -5,13 +5,6 @@
   processadores de template HTML, expõe uma API JSON consumida pela nova
   SPA (ver data/index.html), o que também torna a interface mais fácil de
   automatizar/integrar (Home Assistant, scripts, etc.).
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
 */
 #pragma once
 
@@ -27,7 +20,7 @@ public:
   // surplus: apontador para o apontador do gestor de excedentes ativo (a
   // instância pode ser substituída em runtime quando o utilizador muda de
   // modo); onSurplusModeChanged é chamado depois de gravar uma configuração
-  // que altere surplus.mode, para o FreeDS.ino recriar o gestor certo.
+  // que altere surplus.mode, para o Lusol.ino recriar o gestor certo.
   void begin(LoadController *load, TemperatureManager *temperature, NetworkManager *network,
              SurplusManager **surplus, CurrentClampSensor *clamp, void (*onSurplusModeChanged)());
 

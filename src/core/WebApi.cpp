@@ -1,12 +1,5 @@
 /*
   WebApi.cpp - ver WebApi.h
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
 */
 #include "WebApi.h"
 #include "AppConfig.h"
@@ -320,7 +313,7 @@ void WebApi::registerSystemRoutes() {
   server_.on("/api/backup", HTTP_GET, [](AsyncWebServerRequest *request) {
     if (!requireAuth(request)) return;
     AsyncWebServerResponse *response = request->beginResponse(200, "application/json", ConfigStore::exportJson());
-    response->addHeader("Content-Disposition", "attachment; filename=\"freeds-backup.json\"");
+    response->addHeader("Content-Disposition", "attachment; filename=\"lusol-backup.json\"");
     request->send(response);
   });
 

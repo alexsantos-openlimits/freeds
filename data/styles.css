@@ -1,31 +1,32 @@
 /* =========================================================
-   FreeDS — Web UI
+   Lusol — Web UI
    Plain CSS, no framework. Mobile-first, responsive.
    ========================================================= */
 
 :root {
-  --color-bg: #f4f6f5;
+  --color-bg: #f5f7fa;
   --color-surface: #ffffff;
-  --color-surface-alt: #f9fafb;
-  --color-border: #e3e7e5;
-  --color-text: #1c2320;
-  --color-text-muted: #667169;
-  --color-text-faint: #8a938c;
+  --color-surface-alt: #eef2f6;
+  --color-border: #dde4ea;
+  --color-text: #16232f;
+  --color-text-muted: #5b6b78;
+  --color-text-faint: #8b98a3;
 
-  --color-primary: #1f8a4c;
-  --color-primary-dark: #166a3a;
-  --color-primary-soft: #e6f4ec;
+  --color-primary: #16405f;
+  --color-primary-dark: #0f2c42;
+  --color-primary-soft: #e3eaf1;
 
-  --color-solar: #e8a33d;
-  --color-solar-soft: #fbf0dc;
-  --color-grid: #3b7dd8;
-  --color-grid-soft: #e4edfb;
+  --color-solar: #e3a530;
+  --color-solar-soft: #fbf0da;
+  --color-grid: #2f8fd1;
+  --color-grid-soft: #e3f0fb;
   --color-battery: #8a5cd6;
   --color-battery-soft: #ede6fa;
-  --color-danger: #d64545;
-  --color-danger-soft: #fbe7e7;
+  --color-danger: #d1483f;
+  --color-danger-soft: #fbe7e5;
   --color-warning: #c98a17;
   --color-warning-soft: #fbf0da;
+  --color-accent: #f2c94c;
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -52,9 +53,9 @@
     --color-text-muted: #a2aca6;
     --color-text-faint: #71797a;
 
-    --color-primary: #35c47a;
-    --color-primary-dark: #2ba766;
-    --color-primary-soft: #163a26;
+    --color-primary: #4f8fc0;
+    --color-primary-dark: #3a719e;
+    --color-primary-soft: #1a2c3a;
 
     --color-solar: #f0b559;
     --color-solar-soft: #3a2f16;
@@ -62,10 +63,11 @@
     --color-grid-soft: #182c42;
     --color-battery: #b090ea;
     --color-battery-soft: #2c2140;
-    --color-danger: #e57373;
+    --color-danger: #e5766c;
     --color-danger-soft: #3a1e1e;
     --color-warning: #e0ad4b;
     --color-warning-soft: #3a2f16;
+    --color-accent: #f2c94c;
 
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
     --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
@@ -126,6 +128,9 @@ img, svg { max-width: 100%; }
 .sidebar-brand .brand-text { display: flex; flex-direction: column; }
 .sidebar-brand .brand-text strong { font-size: 16px; letter-spacing: 0.2px; }
 .sidebar-brand .brand-text span { font-size: 11.5px; color: var(--color-text-muted); }
+
+.brand-wordmark { letter-spacing: 0.5px; }
+.brand-wordmark .brand-o { color: var(--color-accent); }
 
 .sidebar-nav {
   flex: 1 1 auto;

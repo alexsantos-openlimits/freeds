@@ -1,5 +1,5 @@
 /*
-  FreeDS.ino - Ponto de entrada da aplicação (setup/loop)
+  Lusol.ino - Ponto de entrada da aplicação (setup/loop)
   Gestor de excedentes para ESP32 (Heltec WiFi Kit 32)
 
   Esta reescrita mantém o hardware original (mesmos pinos, mesmo ecrã OLED,
@@ -12,21 +12,6 @@
   EnergyTracker e WebApi.
 
   Inspirado em opends+ (https://github.com/iqas/derivador)
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <Arduino.h>
 #include <WiFi.h>
@@ -56,7 +41,7 @@ extern "C" {
 #include "managers/HttpInverterManager.h"
 
 // ----------------------------------------------------------------------
-// Pinagem de hardware (inalterada face à placa FreeDS original)
+// Pinagem de hardware (inalterada face à placa Lusol original)
 // ----------------------------------------------------------------------
 static const uint8_t PIN_PWM = 25;
 static const uint8_t PIN_ESP01_RX = 17, PIN_ESP01_TX = 5; // UART2 (módulo ESP-01, modo Solax V2)
@@ -183,7 +168,7 @@ void setup() {
                  &g_clampSensor, recreateSurplusManager);
 
   if (g_networkManager.isAccessPointMode()) {
-    g_displayManager.showLogo("LIGUE-SE AO SSID:\nFreeDS\n192.168.4.1", false);
+    g_displayManager.showLogo("LIGUE-SE AO SSID:\nLusol\n192.168.4.1", false);
   } else {
     // A ligação em si é assíncrona (ver NetworkManager: tenta a rede 1, depois
     // a rede 2, só depois cai em modo AP) - o resto da inicialização só
@@ -221,7 +206,7 @@ void loop() {
     g_surplusManager->loop();
     g_loadController.onNewReading(g_surplusManager->reading(), g_surplusManager->isConnected());
 
-    // Modo escravo: outro FreeDS "mestre" pode pedir para desligar este PWM
+    // Modo escravo: outro Lusol "mestre" pode pedir para desligar este PWM
     // (ex.: o mestre parou por temperatura ou já não tem excedente).
     if (ConfigStore::get().surplus.mode == SLAVE_MODE) {
       auto *slave = static_cast<HttpInverterManager *>(g_surplusManager);

@@ -10,13 +10,6 @@
   ficheiros .ino (getSensorData(), setGetDataTime(), defineWebMonitorFields())
   por uma fábrica única (SurplusManagerFactory) que instancia o gestor
   correto de acordo com o modo configurado (SurplusManagerConfig::mode).
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
 */
 #pragma once
 

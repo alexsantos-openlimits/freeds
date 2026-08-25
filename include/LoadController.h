@@ -7,15 +7,8 @@
   ciclo por saída em vez de quatro blocos de código quase idênticos.
 
   O hardware controlado mantém-se inalterado: 1 saída PWM/DAC para o
-  triac/dimmer e 4 saídas de relé, nos mesmos pinos da placa FreeDS
-  original (ver LoadControllerPins em FreeDS.ino).
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+  triac/dimmer e 4 saídas de relé, nos mesmos pinos da placa Lusol
+  original (ver LoadControllerPins em Lusol.ino).
 */
 #pragma once
 

@@ -2,7 +2,7 @@
   GoodweManager.h - Gestor de excedentes para inversores GoodWe ES/EM
 
   Substitui sendUDPRequest()/parseUDP() de goodwe.ino e o fio condutor que
-  existia em FreeDS.ino/Support_functions.ino (abertura do socket UDP no
+  existia em Lusol.ino/Support_functions.ino (abertura do socket UDP no
   setup, envio periódico do pedido a partir de getSensorData() e
   processamento não bloqueante do datagrama de resposta a cada volta do
   loop()).
@@ -14,13 +14,6 @@
   carga/descarga, SoC), tensão/potência/frequência de rede e temperatura
   do inversor. Ver GoodweManager.cpp para os offsets exatos (idênticos aos
   de goodwe.ino original).
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
 */
 #pragma once
 

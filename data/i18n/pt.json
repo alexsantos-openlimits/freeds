@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "FreeDS",
+    "title": "Lusol",
     "subtitle": "Derivador de Excedentes Solares"
   },
   "nav": {
@@ -103,8 +103,11 @@
     "signal": "Sinal",
     "ip_address": "Endereço IP",
     "source_status": "Fonte de Dados",
-    "source_connected": "A receber dados",
-    "source_fault": "Falha na comunicação",
+    "source_connected": "DDSU · ligado",
+    "source_fault": "DDSU · sem ligação",
+    "mqtt_connected": "MQTT · ligado",
+    "mqtt_fault": "MQTT · sem ligação",
+    "mqtt_disabled": "MQTT · desativado",
     "uptime": "Tempo em funcionamento",
     "temperatures": "Temperaturas",
     "temp_thermo": "Termoacumulador",
@@ -201,7 +204,7 @@
       "24": "Wibeee",
       "25": "Shelly EM",
       "26": "Fronius API",
-      "27": "Modo escravo (outro FreeDS mestre)",
+      "27": "Modo escravo (outro Lusol mestre)",
       "28": "GoodWe (UDP)",
       "41": "MQTT (broker genérico)",
       "42": "ICC Solar (MQTT)",

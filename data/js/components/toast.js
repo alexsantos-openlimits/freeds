@@ -1,4 +1,4 @@
-// FreeDS — lightweight toast notifications, no dependencies.
+// Lusol — lightweight toast notifications, no dependencies.
 
 function stack() {
   let node = document.getElementById("toast-stack");

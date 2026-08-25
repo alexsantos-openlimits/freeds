@@ -1,12 +1,5 @@
 /*
   ConfigStore.cpp - Persistência da configuração em "/config.json" (SPIFFS)
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
 */
 #include "AppConfig.h"
 #include "Logger.h"
@@ -26,7 +19,7 @@ void ConfigStore::applyDefaults(AppConfig &cfg) {
 
   uint8_t mac[6];
   WiFi.macAddress(mac);
-  snprintf(cfg.network.hostname, sizeof(cfg.network.hostname), "freeds_%02x%02x", mac[4], mac[5]);
+  snprintf(cfg.network.hostname, sizeof(cfg.network.hostname), "lusol_%02x%02x", mac[4], mac[5]);
 
   snprintf(cfg.mqtt.relayTopic[0], sizeof(cfg.mqtt.relayTopic[0]), "%s/relay/1/STATUS", cfg.network.hostname);
   snprintf(cfg.mqtt.relayTopic[1], sizeof(cfg.mqtt.relayTopic[1]), "%s/relay/2/STATUS", cfg.network.hostname);

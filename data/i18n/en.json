@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "FreeDS",
+    "title": "Lusol",
     "subtitle": "Solar Surplus Diverter"
   },
   "nav": {
@@ -103,8 +103,11 @@
     "signal": "Signal",
     "ip_address": "IP Address",
     "source_status": "Data Source",
-    "source_connected": "Receiving data",
-    "source_fault": "Communication fault",
+    "source_connected": "DDSU · connected",
+    "source_fault": "DDSU · disconnected",
+    "mqtt_connected": "MQTT · connected",
+    "mqtt_fault": "MQTT · disconnected",
+    "mqtt_disabled": "MQTT · disabled",
     "uptime": "Uptime",
     "temperatures": "Temperatures",
     "temp_thermo": "Water Tank",
@@ -201,7 +204,7 @@
       "24": "Wibeee",
       "25": "Shelly EM",
       "26": "Fronius API",
-      "27": "Slave mode (other FreeDS master)",
+      "27": "Slave mode (other Lusol master)",
       "28": "GoodWe (UDP)",
       "41": "MQTT (generic broker)",
       "42": "ICC Solar (MQTT)",

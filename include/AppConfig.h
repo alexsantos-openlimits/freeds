@@ -1,18 +1,11 @@
 /*
-  AppConfig.h - Configuração persistente da aplicação FreeDS
+  AppConfig.h - Configuração persistente da aplicação Lusol
 
   Substitui a antiga struct CONFIG monolítica (guardada em bruto na EEPROM,
   com uma escada de migrações manuais por versão) por uma configuração
   organizada em secções, serializada em JSON e guardada em "/config.json"
   no sistema de ficheiros interno. Campos novos assumem sempre um valor
   por omissão sensato, por isso não é necessária nenhuma migração manual.
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
 */
 #pragma once
 
@@ -68,7 +61,7 @@ struct SurplusManagerConfig {
   uint8_t gridPhase = 1;
   uint32_t maxErrorTimeMs = 20000; // Tempo máximo sem dados válidos antes de desligar por segurança
   uint32_t pollIntervalMs = 1500;  // Intervalo entre leituras (ajustado por gestor)
-  uint16_t pwmSlaveOnPercent = 0;  // Limiar de % do FreeDS mestre para ativar este escravo
+  uint16_t pwmSlaveOnPercent = 0;  // Limiar de % do Lusol mestre para ativar este escravo
 };
 
 struct PidConfig {

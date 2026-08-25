@@ -44,7 +44,7 @@ void NetworkManager::begin() {
 void NetworkManager::startAccessPoint() {
   apMode_ = true;
   WiFi.mode(WIFI_AP);
-  WiFi.softAP("FreeDS");
+  WiFi.softAP("Lusol");
   IPAddress myIp = WiFi.softAPIP();
   Logger::info("Rede: modo ponto de acesso, IP local: %s\n", myIp.toString().c_str());
   dnsServer_.start(53, "*", myIp);

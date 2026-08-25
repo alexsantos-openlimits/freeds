@@ -1,4 +1,4 @@
-// FreeDS — tiny hash router. No dependencies, no history API needed
+// Lusol — tiny hash router. No dependencies, no history API needed
 // since the device serves a single static page.
 
 export function createRouter(routes, { defaultPath = "dashboard", onChange } = {}) {

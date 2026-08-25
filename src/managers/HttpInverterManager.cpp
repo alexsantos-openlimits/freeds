@@ -1,12 +1,5 @@
 /*
   HttpInverterManager.cpp - ver HttpInverterManager.h
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
 */
 #include "managers/HttpInverterManager.h"
 
@@ -22,7 +15,7 @@
 namespace {
 
 // Pinos fixos por hardware da UART2 ligada ao módulo ESP-01 (só usada em
-// SOLAX_V2). Ver FreeDS.ino original (pin_rx/pin_tx sob #ifdef OLED).
+// SOLAX_V2). Ver Lusol.ino original (pin_rx/pin_tx sob #ifdef OLED).
 const uint8_t kEsp01RxPin = 17;
 const uint8_t kEsp01TxPin = 5;
 
@@ -682,13 +675,13 @@ void HttpInverterManager::parseFronius(const char *json) {
   publishReading(r);
 }
 
-// FreeDS mestre (SLAVE_MODE) - GET /masterdata
+// Lusol mestre (SLAVE_MODE) - GET /masterdata
 void HttpInverterManager::parseMasterFreeDs(const char *json) {
   DynamicJsonDocument doc(kJsonDocSize);
   DeserializationError error = deserializeJson(doc, json);
 
   if (error) {
-    Logger::info("HttpInverterManager: deserializeJson() master FreeDS falhou: %s\n", error.c_str());
+    Logger::info("HttpInverterManager: deserializeJson() master Lusol falhou: %s\n", error.c_str());
     return;
   }
 
@@ -819,7 +812,7 @@ void HttpInverterManager::masterFieldMask(uint8_t masterWversion, PowerReadingFi
   out = PowerReadingFields();  // tudo a false
 
   // Posições de bit idênticas à union original (Support_functions.ino /
-  // FreeDS.ino). Bits sem campo equivalente em PowerReading (energyTotal,
+  // Lusol.ino). Bits sem campo equivalente em PowerReading (energyTotal,
   // "voltage" isolado do meter, activePower, aparentPower, reactivePower,
   // importReactive, exportReactive, phaseAngle, wtogrid) são ignorados de
   // propósito.

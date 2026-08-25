@@ -16,13 +16,6 @@
   - SDM_METER     (sdm120):  um único pedido de 80 registos (função 0x04).
   - MUSTSOLAR     (mustSolar): um único pedido de 75 registos (função 0x03)
     a partir do endereço 6271.
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
 */
 #pragma once
 
@@ -39,7 +32,7 @@ public:
   const char *name() const override;
 
 private:
-  // UART1 do ESP32, tal como FreeDS.ino original (RX1/TX1).
+  // UART1 do ESP32, tal como Lusol.ino original (RX1/TX1).
   static const int8_t kRxPin = 19;
   static const int8_t kTxPin = 23;
   static const uint32_t kReceiveTimeoutMs = 10; // igual ao original (modbusReceiveBuffer)

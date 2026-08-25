@@ -2,7 +2,7 @@
   NetworkManager.h - Ligação Wi-Fi (estação + ponto de acesso de
   configuração inicial), mDNS e hora NTP.
 
-  Substitui a parte de ligação Wi-Fi/portal cativo do antigo FreeDS.ino.
+  Substitui a parte de ligação Wi-Fi/portal cativo do antigo Lusol.ino.
 
   Sequência de arranque (quando já há rede configurada): tenta a rede 1
   durante kPerNetworkTimeoutMs; se não conseguir, tenta a rede 2 pelo mesmo
@@ -11,13 +11,6 @@
   sucesso, uma queda de rede já não volta ao modo AP automaticamente -
   fica a tentar as duas redes indefinidamente (para não deixar o
   dispositivo "às escuras" só por uma falha momentânea do router).
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
 */
 #pragma once
 

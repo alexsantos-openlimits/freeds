@@ -7,13 +7,6 @@
   mesmo ficheiro). Agora este serviço trata apenas da ligação/mensagens; os
   gestores de excedentes que precisem de dados por MQTT (ex.: MqttSurplusManager)
   registam-se com onTopic().
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
 */
 #pragma once
 

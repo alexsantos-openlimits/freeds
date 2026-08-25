@@ -1,4 +1,4 @@
-// FreeDS — tiny helpers to reduce boilerplate in settings forms.
+// Lusol — tiny helpers to reduce boilerplate in settings forms.
 import { toast } from "./toast.js";
 
 export function section(titleKey, i18n, bodyHtml) {

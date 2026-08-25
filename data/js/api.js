@@ -1,4 +1,4 @@
-// FreeDS — thin wrapper around the device REST API.
+// Lusol — thin wrapper around the device REST API.
 // No build step, no dependencies: plain fetch() against same-origin endpoints.
 
 async function request(path, options = {}) {

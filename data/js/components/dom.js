@@ -1,4 +1,4 @@
-// FreeDS — small DOM / formatting helpers shared across views.
+// Lusol — small DOM / formatting helpers shared across views.
 
 export function el(html) {
   const tpl = document.createElement("template");

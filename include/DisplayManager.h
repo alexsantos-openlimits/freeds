@@ -8,14 +8,7 @@
   incluindo os que vierem a ser adicionados no futuro.
 
   Hardware inalterado: SSD1306 I2C (endereço 0x3c, SDA=4, SCL=15), pino de
-  reset 16, tal como na placa FreeDS original.
-
-  Copyright (C) 2020-2026 Pablo Zerón (https://github.com/pablozg/freeds)
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+  reset 16, tal como na placa Lusol original.
 */
 #pragma once
 
@@ -26,7 +19,7 @@
 // "SSD1306" (usado pelo resto do código) é apenas um typedef de SSD1306Wire
 // (ver lib/esp8266-oled-ssd1306/src/SSD1306.h); não pode ser forward-declarado
 // como classe ("class SSD1306;") porque isso colidiria com esse typedef em
-// qualquer ficheiro que também inclua SSD1306.h (ex.: FreeDS.ino) - por isso
+// qualquer ficheiro que também inclua SSD1306.h (ex.: Lusol.ino) - por isso
 // aqui é forward-declarado pelo nome real da classe.
 class SSD1306Wire;
 class LoadController;
