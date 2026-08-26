@@ -55,6 +55,16 @@ void GoodweManager::processIncoming() {
   if (len <= 0) { return; }
   buffer_[len] = 0;
 
+  // O maior offset lido abaixo é buffer_[87]; um datagrama mais curto do
+  // que isso não é uma resposta GoodWe válida (ex.: pacote truncado ou de
+  // outro dispositivo a chegar à mesma porta UDP) - descarta-se aqui em vez
+  // de ler memória não inicializada e publicar uma leitura sem sentido
+  // como se fosse válida.
+  if (len < 88) {
+    Logger::info("GoodweManager: datagrama demasiado curto (%d bytes), descartado\n", len);
+    return;
+  }
+
   int16_t value = 0;
   uint16_t uvalue = 0;
   PowerReading r = reading_;

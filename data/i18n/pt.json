@@ -105,6 +105,8 @@
     "source_status": "Fonte de Dados",
     "source_connected": "DDSU · ligado",
     "source_fault": "DDSU · sem ligação",
+    "state_connected": "ligado",
+    "state_disconnected": "sem ligação",
     "mqtt_connected": "MQTT · ligado",
     "mqtt_fault": "MQTT · sem ligação",
     "mqtt_disabled": "MQTT · desativado",

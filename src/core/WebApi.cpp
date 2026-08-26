@@ -158,6 +158,7 @@ String WebApi::buildStatusJson() {
   mqtt["connected"] = MqttService::connected();
 
   doc["sourceConnected"] = sm ? sm->isConnected() : false;
+  doc["sourceName"] = sm ? sm->name() : "";
   doc["dataFault"] = load_->hasDataFault();
   doc["uptimeSeconds"] = millis() / 1000;
 
@@ -214,6 +215,12 @@ void WebApi::handleConfigSection(AsyncWebServerRequest *request, uint8_t *data, 
     load_->reloadTunables();
   } else if (strcmp(section, "mqtt") == 0) {
     MqttService::reload();
+    // Se o gestor de excedentes ativo ler dados via MQTT (modos MQTT_BROKER/
+    // ICC_SOLAR), os tópicos que ele subscreveu (solaxTopic/meterTopic/
+    // socTopic) foram fixados no momento em que foi criado - sem recriá-lo
+    // aqui, alterar esses tópicos nesta página nunca teria efeito sem
+    // reiniciar o dispositivo.
+    if (onSurplusModeChanged_) onSurplusModeChanged_();
   }
 
   request->send(200, "application/json", ConfigStore::exportJson());

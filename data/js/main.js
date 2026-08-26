@@ -2,7 +2,7 @@ import { Api } from "./api.js";
 import { I18n } from "./i18n.js";
 import { createRouter } from "./router.js";
 import { Icon } from "./components/icons.js";
-import { fmtUptime } from "./components/dom.js";
+import { fmtUptime, sourceStatusLabel } from "./components/dom.js";
 import { toast } from "./components/toast.js";
 
 import mountDashboard from "./views/dashboard.js";
@@ -105,9 +105,7 @@ async function boot() {
     const sourceOk = status.sourceConnected && !status.dataFault;
     sourcePill.classList.toggle("ok", !!sourceOk);
     sourcePill.classList.toggle("bad", !sourceOk);
-    sourcePill.querySelector("[data-role='text']").textContent = sourceOk
-      ? I18n.t("dashboard.source_connected")
-      : I18n.t("dashboard.source_fault");
+    sourcePill.querySelector("[data-role='text']").textContent = sourceStatusLabel(status, I18n);
 
     const mqtt = status.mqtt || {};
     mqttPill.classList.toggle("ok", !!mqtt.connected);

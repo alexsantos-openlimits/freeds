@@ -85,7 +85,6 @@ private:
   PowerReading reading_{};
   PowerReading lastVariationReading_{};
   unsigned long lastVariationMs_ = 0;
-  unsigned long lastReadingMs_ = 0;
   bool sourceConnected_ = false;
   bool variationTimeout_ = true;
   bool connectionTimeout_ = true;

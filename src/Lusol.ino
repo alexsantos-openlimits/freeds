@@ -86,6 +86,12 @@ void recreateSurplusManager() {
   delete g_surplusManager;
   g_surplusManager = createSurplusManager();
   if (g_surplusManager) g_surplusManager->begin();
+
+  // clearTopics() acima esvazia também os tópicos de comando do Home
+  // Assistant (subscribeCommands() só regista uma vez por arranque) -
+  // sem isto ficavam mortos para sempre depois da primeira alteração de
+  // configuração feita já com o MQTT ligado.
+  g_mqttPublisher.resubscribeCommands();
 }
 
 void handleButton() {
@@ -229,6 +235,7 @@ void loop() {
     struct tm now;
     bool hasTime = getLocalTime(&now);
     float gridWatts = g_surplusManager ? g_surplusManager->reading().gridWatts : 0;
-    g_energyTracker.update(gridWatts, hasTime && g_networkManager.hasNtpTime(), now);
+    bool sourceConnected = g_surplusManager && g_surplusManager->isConnected();
+    g_energyTracker.update(gridWatts, sourceConnected, hasTime && g_networkManager.hasNtpTime(), now);
   }
 }

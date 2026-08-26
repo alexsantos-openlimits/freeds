@@ -56,7 +56,6 @@ void LoadController::reloadTunables() {
 
 void LoadController::onNewReading(const PowerReading &reading, bool sourceConnected) {
   reading_ = reading;
-  lastReadingMs_ = millis();
   sourceConnected_ = sourceConnected;
 }
 
@@ -76,10 +75,24 @@ void LoadController::checkDataHealth() {
     variationTimeout_ = true;
   }
 
-  if (!connectionTimeout_ && (millis() - lastReadingMs_) > cfg.surplus.maxErrorTimeMs) {
-    Logger::info("PWM: a desligar - falha na ligacao com a fonte de dados\n");
-    reading_ = PowerReading{};
-    connectionTimeout_ = true;
+  // sourceConnected_ já reflete corretamente SurplusManagerBase::isConnected()
+  // (só fica connectionTimeout_=false novo, tal como o próprio timer de
+  // isConnected() já contabiliza). Antes isto era recalculado aqui a partir
+  // de um relógio próprio (lastReadingMs_) que era reposto a cada iteração
+  // do loop principal, quer tivesse chegado dado novo ou não - na prática
+  // nunca chegava a disparar, e pior: uma vez que disparasse por outra via,
+  // nada voltava a pôr connectionTimeout_ a false, desligando o controlo
+  // automático em definitivo até reiniciar o dispositivo, mesmo depois de a
+  // fonte de dados voltar a responder.
+  bool wasConnectionTimeout = connectionTimeout_;
+  connectionTimeout_ = !sourceConnected_;
+  if (connectionTimeout_ != wasConnectionTimeout) {
+    if (connectionTimeout_) {
+      Logger::info("PWM: a desligar - falha na ligacao com a fonte de dados\n");
+      reading_ = PowerReading{};
+    } else {
+      Logger::info("PWM: ligacao com a fonte de dados recuperada\n");
+    }
   }
 
   if ((connectionTimeout_ || variationTimeout_ || !running_) && pid_.GetMode() == PID::AUTOMATIC) {

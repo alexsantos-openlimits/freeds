@@ -1,8 +1,18 @@
 #include "EnergyTracker.h"
 #include "AppConfig.h"
 
-void EnergyTracker::update(float gridWatts, bool ntpTimeValid, const struct tm &now) {
+void EnergyTracker::update(float gridWatts, bool sourceConnected, bool ntpTimeValid, const struct tm &now) {
   if (!ntpTimeValid) {
+    lastMs_ = millis();
+    return;
+  }
+
+  // Sem isto, uma vez desligada a fonte de dados, reading().gridWatts fica
+  // "congelado" no último valor conhecido (SurplusManagerBase nunca o
+  // limpa por si só) e continuava a ser contabilizado como se fosse real -
+  // tal como as leituras absurdas abaixo, descarta-se e só se repõe o
+  // relógio, para o próximo dt válido não incluir o tempo desligado.
+  if (!sourceConnected) {
     lastMs_ = millis();
     return;
   }

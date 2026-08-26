@@ -35,8 +35,6 @@ void subscribeAll() {
   }
 }
 
-bool debugEnabled() { return (ConfigStore::get().system.debugFlags & 0x01) != 0; }
-
 const char *disconnectReasonText(AsyncMqttClientDisconnectReason reason) {
   switch (reason) {
     case AsyncMqttClientDisconnectReason::TCP_DISCONNECTED: return "TCP desligado (verifica IP/porta do broker e a rede)";
@@ -57,7 +55,7 @@ void onMqttConnect(bool sessionPresent) {
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
-  if (debugEnabled()) {
+  if (Logger::debugEnabled()) {
     Logger::info("MQTT: desligado do broker - %s\n", disconnectReasonText(reason));
   } else {
     Logger::info("MQTT: desligado do broker\n");
@@ -121,7 +119,7 @@ void configureAndConnect() {
   g_configured = true;
   g_lastReconnectAttempt = millis();
 
-  if (debugEnabled()) {
+  if (Logger::debugEnabled()) {
     Logger::info("MQTT: a ligar a %s:%u como \"%s\" (utilizador: %s)\n", cfg.broker, (unsigned)cfg.port,
                  ConfigStore::get().network.hostname, strlen(cfg.user) ? cfg.user : "(sem utilizador)");
   }
@@ -141,7 +139,7 @@ void MqttService::loop() {
   if (!g_configured) return;
   if (!g_client.connected() && millis() - g_lastReconnectAttempt > 5000) {
     g_lastReconnectAttempt = millis();
-    if (debugEnabled()) Logger::info("MQTT: a tentar religar...\n");
+    if (Logger::debugEnabled()) Logger::info("MQTT: a tentar religar...\n");
     g_client.connect();
   }
 }

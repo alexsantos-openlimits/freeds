@@ -263,6 +263,11 @@ void MqttPublisher::publishDiscoveryIfNeeded() {
   }
 }
 
+void MqttPublisher::resubscribeCommands() {
+  commandsSubscribed_ = false;
+  subscribeCommands();
+}
+
 void MqttPublisher::subscribeCommands() {
   if (commandsSubscribed_) return;
   commandsSubscribed_ = true;

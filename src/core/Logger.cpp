@@ -22,3 +22,5 @@ int Logger::info(const char *format, ...) {
   }
   return rcode;
 }
+
+bool Logger::debugEnabled() { return (ConfigStore::get().system.debugFlags & 0x01) != 0; }

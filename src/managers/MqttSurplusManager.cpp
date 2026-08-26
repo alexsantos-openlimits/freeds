@@ -63,11 +63,15 @@ void MqttSurplusManager::loop() {
 }
 
 void MqttSurplusManager::handleMeterTopic(const char *topic, const char *payload) {
+  if (Logger::debugEnabled()) {
+    Logger::info("MqttSurplusManager: mensagem em \"%s\": %s\n", topic, payload);
+  }
+
   DynamicJsonDocument doc(512);
   DeserializationError error = deserializeJson(doc, payload);
 
   if (error) {
-    Logger::info("MqttSurplusManager: deserializeJson() Meter MQTT falhou: %s\n", error.c_str());
+    Logger::info("MqttSurplusManager: deserializeJson() Meter MQTT falhou (\"%s\"): %s\n", topic, error.c_str());
     return;
   }
 
@@ -88,11 +92,15 @@ void MqttSurplusManager::handleMeterTopic(const char *topic, const char *payload
 }
 
 void MqttSurplusManager::handleSolaxTopic(const char *topic, const char *payload) {
+  if (Logger::debugEnabled()) {
+    Logger::info("MqttSurplusManager: mensagem em \"%s\": %s\n", topic, payload);
+  }
+
   DynamicJsonDocument doc(512);
   DeserializationError error = deserializeJson(doc, payload);
 
   if (error) {
-    Logger::info("MqttSurplusManager: deserializeJson() Solax MQTT falhou: %s\n", error.c_str());
+    Logger::info("MqttSurplusManager: deserializeJson() Solax MQTT falhou (\"%s\"): %s\n", topic, error.c_str());
     return;
   }
 
@@ -117,6 +125,10 @@ void MqttSurplusManager::handleSolaxTopic(const char *topic, const char *payload
 }
 
 void MqttSurplusManager::handleIccTopic(const char *topic, const char *payload) {
+  if (Logger::debugEnabled()) {
+    Logger::info("MqttSurplusManager: mensagem em \"%s\": %s\n", topic, payload);
+  }
+
   const MqttConfig &mqtt = ConfigStore::get().mqtt;
   PowerReading r = reading_;
   float value = atof(payload);

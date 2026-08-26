@@ -1,6 +1,6 @@
 import { Icon } from "../components/icons.js";
 import { gaugeSvg } from "../components/gauge.js";
-import { fmtWatts, fmtKwh, fmtNumber, fmtUptime } from "../components/dom.js";
+import { fmtWatts, fmtKwh, fmtNumber, fmtUptime, sourceStatusLabel } from "../components/dom.js";
 import { toast } from "../components/toast.js";
 
 export default async function mount(container, ctx) {
@@ -293,10 +293,7 @@ export default async function mount(container, ctx) {
 
     const sourceCard = container.querySelector("#card-source");
     if (sourceCard) {
-      const ok = status.sourceConnected && !status.dataFault;
-      sourceCard.querySelector("[data-role='value']").textContent = ok
-        ? i18n.t("dashboard.source_connected")
-        : i18n.t("dashboard.source_fault");
+      sourceCard.querySelector("[data-role='value']").textContent = sourceStatusLabel(status, i18n);
       sourceCard.querySelector("[data-role='detail']").textContent = `${i18n.t("dashboard.uptime")}: ${fmtUptime(status.uptimeSeconds)}`;
     }
 

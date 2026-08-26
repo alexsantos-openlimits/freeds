@@ -26,6 +26,14 @@ public:
              TemperatureManager *temperature);
   void loop();
 
+  // MqttService::clearTopics() (chamado sempre que o gestor de excedentes é
+  // recriado - ver Lusol.ino::recreateSurplusManager()) esvazia TODAS as
+  // subscrições MQTT, incluindo os tópicos de comando registados aqui. Sem
+  // isto, os comandos do Home Assistant (modo, relés, PWM manual) ficavam
+  // mortos para sempre depois da primeira alteração na página de Gestor de
+  // Excedentes ou de MQTT, até reiniciar o dispositivo.
+  void resubscribeCommands();
+
 private:
   void publishStatusJson();
   void publishDiscoveryIfNeeded();

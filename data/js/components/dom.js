@@ -67,6 +67,19 @@ export function timeInputToHhmmInt(value) {
   return (hh || 0) * 100 + (mm || 0);
 }
 
+// Rótulo do balão/mosaico de "fonte de dados": usa o nome do gestor de
+// excedentes ativo (ex.: "DDSU666", "Solax V2", "MQTT") em vez de um texto
+// genérico fixo, para continuar correto sempre que o utilizador troca de
+// fonte. Cai no texto antigo (sem nome) só enquanto ainda não há nenhum
+// gestor instanciado (arranque).
+export function sourceStatusLabel(status, i18n) {
+  const ok = status.sourceConnected && !status.dataFault;
+  const name = (status.sourceName || "").replace(/^Modbus\s+/, "");
+  if (!name) return ok ? i18n.t("dashboard.source_connected") : i18n.t("dashboard.source_fault");
+  const state = ok ? i18n.t("dashboard.state_connected") : i18n.t("dashboard.state_disconnected");
+  return `${name} · ${state}`;
+}
+
 export function escapeHtml(str) {
   return String(str ?? "").replace(/[&<>"']/g, (c) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",

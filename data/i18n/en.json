@@ -105,6 +105,8 @@
     "source_status": "Data Source",
     "source_connected": "DDSU · connected",
     "source_fault": "DDSU · disconnected",
+    "state_connected": "connected",
+    "state_disconnected": "disconnected",
     "mqtt_connected": "MQTT · connected",
     "mqtt_fault": "MQTT · disconnected",
     "mqtt_disabled": "MQTT · disabled",

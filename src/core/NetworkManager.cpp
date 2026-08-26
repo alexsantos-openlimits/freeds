@@ -8,8 +8,6 @@
 
 namespace {
 WiFiMulti g_wifiMulti; // só usado depois de já ter ligado uma vez (retry indefinido, alternando as duas redes)
-
-bool debugEnabled() { return (ConfigStore::get().system.debugFlags & 0x01) != 0; }
 } // namespace
 
 int WifiGetRssiAsQuality(int rssi) {
@@ -126,7 +124,7 @@ void NetworkManager::loop() {
     // Dentro da mesma janela, repete a tentativa de vez em quando (o
     // primeiro WiFi.begin() pode falhar rápido, ex.: password errada).
     if (millis() - lastAttemptMs_ > kAttemptRetryMs) {
-      if (debugEnabled()) {
+      if (Logger::debugEnabled()) {
         Logger::info("Rede: ainda sem ligacao (status wifi %d), a tentar de novo...\n", (int)WiFi.status());
       }
       const char *ssid = bootPhase_ == WifiBootPhase::TryingPrimary ? net.ssid1 : net.ssid2;
@@ -140,7 +138,7 @@ void NetworkManager::loop() {
   // indefinidamente, sem voltar a modo AP por conta própria.
   if (millis() - lastReconnectAttemptMs_ > 5000) {
     lastReconnectAttemptMs_ = millis();
-    if (debugEnabled()) Logger::info("Rede: ligacao perdida, a tentar religar...\n");
+    if (Logger::debugEnabled()) Logger::info("Rede: ligacao perdida, a tentar religar...\n");
     g_wifiMulti.run();
   }
 }

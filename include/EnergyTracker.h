@@ -11,7 +11,7 @@
 class EnergyTracker {
 public:
   void begin() { lastMs_ = millis(); }
-  void update(float gridWatts, bool ntpTimeValid, const struct tm &now);
+  void update(float gridWatts, bool sourceConnected, bool ntpTimeValid, const struct tm &now);
 
 private:
   unsigned long lastMs_ = 0;
