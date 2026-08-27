@@ -65,6 +65,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "energy_flow": "Energy Flow",
     "working_mode": "Working mode",
     "mode_auto": "Automatic",
     "mode_manual": "Manual",

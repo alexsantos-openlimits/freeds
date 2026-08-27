@@ -65,6 +65,7 @@
   },
   "dashboard": {
     "title": "Painel",
+    "energy_flow": "Fluxo de Energia",
     "working_mode": "Modo de funcionamento",
     "mode_auto": "Automático",
     "mode_manual": "Manual",

@@ -1,5 +1,6 @@
 import { Icon } from "../components/icons.js";
 import { gaugeSvg } from "../components/gauge.js";
+import { energyFlowSvg } from "../components/energyFlow.js";
 import { fmtWatts, fmtKwh, fmtNumber, fmtUptime, sourceStatusLabel } from "../components/dom.js";
 import { toast } from "../components/toast.js";
 
@@ -42,6 +43,11 @@ export default async function mount(container, ctx) {
     return `
       <div class="view-header">
         <h2 data-i18n="dashboard.title"></h2>
+      </div>
+
+      <div class="card energy-flow-card" id="energy-flow-card">
+        <div class="card-title">${Icon.home()} <span data-i18n="dashboard.energy_flow"></span></div>
+        <div id="energy-flow-holder"></div>
       </div>
 
       <div class="card" id="quick-control-card">
@@ -228,6 +234,19 @@ export default async function mount(container, ctx) {
     const gaugeHolder = container.querySelector("#pwm-gauge-holder");
     if (gaugeHolder) {
       gaugeHolder.innerHTML = gaugeSvg({ percent: status.pwmPercent ?? 0, size: 88, color: "var(--color-primary)", label: `${Math.round(status.pwmPercent ?? 0)}%` });
+    }
+
+    const flowHolder = container.querySelector("#energy-flow-holder");
+    if (flowHolder) {
+      const temps = status.temperatures;
+      flowHolder.innerHTML = energyFlowSvg({
+        solarWatts: (status.solar && status.solar.watts) || 0,
+        gridWatts: (status.grid && status.grid.watts) || 0,
+        loadWatts: status.loadWatts || 0,
+        thermoC: temps ? temps.thermo : undefined,
+        hasTemp: !!(temps && temps.enabled),
+        i18n,
+      });
     }
 
     if (f.solarWatts !== false) {

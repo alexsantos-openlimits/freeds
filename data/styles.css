@@ -275,6 +275,57 @@ img, svg { max-width: 100%; }
 /* Em ecrãs largos o mosaico de controlo rápido não precisa de ocupar toda a
    largura - o seu conteúdo (modo + gauge) cabe bem num cartão mais estreito. */
 #quick-control-card { max-width: 560px; }
+
+/* Mosaico "Fluxo de Energia" - diagrama SVG vivo (painel + casa +
+   termoacumulador), ver data/js/components/energyFlow.js. */
+.energy-flow-card { max-width: 620px; }
+.energy-flow-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.ef-sun { stroke: var(--color-solar); stroke-width: 3; stroke-linecap: round; fill: none; }
+.ef-sun circle { fill: var(--color-solar); stroke: none; }
+.ef-panel { fill: var(--color-primary); }
+.ef-panel line { stroke: var(--color-surface); stroke-width: 2; }
+.ef-roof, .ef-wall {
+  fill: var(--color-surface-alt);
+  stroke: var(--color-primary);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+.ef-wire {
+  fill: none;
+  stroke: var(--color-text-faint);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+.ef-wire-solar { stroke: var(--color-solar); }
+.ef-wire-heat { stroke: var(--color-text-faint); }
+.ef-wire-heat.ef-active { stroke: var(--color-danger); }
+.ef-controller rect { fill: var(--color-primary); stroke: none; }
+.ef-controller circle { fill: none; stroke: var(--color-surface); stroke-width: 2; }
+.ef-controller path { stroke: var(--color-surface); stroke-width: 2; stroke-linecap: round; }
+.ef-controller-label { fill: var(--color-surface); font-size: 9px; font-weight: 700; letter-spacing: 0.04em; }
+.ef-tank rect, .ef-tank ellipse {
+  fill: var(--color-surface);
+  stroke: var(--color-primary);
+  stroke-width: 3;
+}
+.ef-gauge-ring { fill: none; stroke: var(--color-primary); stroke-width: 2; }
+.ef-gauge-needle { fill: none; stroke: var(--color-danger); stroke-width: 2; stroke-linecap: round; }
+.ef-droplet { fill: var(--color-grid); }
+.ef-wave { fill: none; stroke: var(--color-warning); stroke-width: 2.5; stroke-linecap: round; opacity: 0.35; }
+.ef-wave.ef-active { opacity: 1; }
+.ef-temp-label { fill: var(--color-text); font-size: 15px; font-weight: 700; }
+.ef-pole { stroke: var(--color-text-faint); stroke-width: 2.5; stroke-linecap: round; }
+.ef-grid-wire { stroke: var(--color-text-faint); }
+.ef-grid-wire.ef-import { stroke: var(--color-danger); }
+.ef-grid-wire.ef-export { stroke: var(--color-grid); }
+.ef-grid-arrow { fill: none; stroke: var(--color-text-faint); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.ef-grid-arrow.ef-import { stroke: var(--color-danger); }
+.ef-grid-arrow.ef-export { stroke: var(--color-grid); }
+.ef-flow-label { fill: var(--color-text-muted); font-size: 11px; font-weight: 600; }
+.ef-heat-label.ef-active { fill: var(--color-danger); }
+.ef-grid-label.ef-import { fill: var(--color-danger); }
+.ef-grid-label.ef-export { fill: var(--color-grid); }
+
 .card-title {
   font-size: 13px;
   font-weight: 700;
