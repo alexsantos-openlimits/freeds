@@ -42,8 +42,13 @@ void LoadController::reloadTunables() {
 
   ledcSetup(pins_.ledcChannel, (double)load.pwmFrequencyHz / 10.0, 10);
   load.dimmerLowCost ? pid_.SetOutputLimits(209, load.maxPwmLowCost) : pid_.SetOutputLimits(0, 1023);
-  pid_.SetTunings(load.pid.kp, load.pid.ki, load.pid.kd, PID::P_ON_M);
+  // A direção tem de ser definida ANTES das constantes: SetTunings() aplica o
+  // sinal de acordo com a direção já registada, enquanto SetControllerDirection()
+  // só troca o sinal das constantes quando o PID está em modo automático. Pela
+  // ordem inversa, mudar "sinal da rede" com o PID em manual deixava as
+  // constantes com o sinal da direção antiga (PWM a atuar ao contrário).
   pid_.SetControllerDirection(ConfigStore::get().surplus.changeGridSign ? PID::DIRECT : PID::REVERSE);
+  pid_.SetTunings(load.pid.kp, load.pid.ki, load.pid.kd, PID::P_ON_M);
 
   if (!load.pwmEnabled) {
     setWorkingMode(LoadWorkingMode::Off);
@@ -132,7 +137,25 @@ void LoadController::applyAutoPidGate() {
   const LoadControlConfig &load = ConfigStore::get().load;
   bool changeSign = ConfigStore::get().surplus.changeGridSign;
 
-  if (!(load.pwmEnabled && !load.manualMode && !manualAutoOverride_ && !variationTimeout_ && !connectionTimeout_ && running_)) return;
+  // Diagnóstico: se o controlo automático não chegar sequer a ser avaliado,
+  // regista uma única vez qual das condições o está a impedir. Sem isto, o
+  // sintoma visível ("há excedente mas o PWM não aquece") não tinha nenhuma
+  // pista no registo sobre a causa.
+  const char *inhibit = nullptr;
+  if (!load.pwmEnabled) inhibit = "PWM desativado na configuracao";
+  else if (load.manualMode) inhibit = "modo manual ativo";
+  else if (manualAutoOverride_) inhibit = "producao solar abaixo do limiar de PWM manual automatico";
+  else if (!running_) inhibit = "PWM parado (corte por temperatura ou por mestre em modo escravo)";
+  else if (connectionTimeout_) inhibit = "sem ligacao a fonte de dados";
+  else if (variationTimeout_) inhibit = "dados da fonte sem variacao";
+
+  if (inhibit != lastInhibitReason_) {
+    lastInhibitReason_ = inhibit;
+    if (inhibit) Logger::info("PWM automatico inibido: %s\n", inhibit);
+    else Logger::info("PWM automatico ativo (a seguir o excedente)\n");
+  }
+
+  if (inhibit) return;
 
   bool shouldEnable;
   if (load.offGrid.enabled) {

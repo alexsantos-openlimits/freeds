@@ -93,6 +93,11 @@ private:
   LoadWorkingMode workingMode_ = LoadWorkingMode::Auto;
   bool manualAutoOverride_ = false; // baixa produção solar força modo manual temporariamente
 
+  // Último motivo pelo qual o controlo automático ficou inibido (aponta para
+  // literais estáticos), só para registar a mudança de estado uma vez em vez
+  // de repetir a mensagem a cada volta do loop.
+  const char *lastInhibitReason_ = "";
+
   uint16_t targetPwm_ = 0;
   uint16_t pwmValue_ = 0;
   uint8_t pwmPercent_ = 0;

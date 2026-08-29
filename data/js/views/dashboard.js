@@ -1,6 +1,6 @@
 import { Icon } from "../components/icons.js";
 import { gaugeSvg } from "../components/gauge.js";
-import { energyFlowSvg } from "../components/energyFlow.js";
+import { energyFlowHtml } from "../components/energyFlow.js";
 import { fmtWatts, fmtKwh, fmtNumber, fmtUptime, sourceStatusLabel } from "../components/dom.js";
 import { toast } from "../components/toast.js";
 
@@ -239,7 +239,7 @@ export default async function mount(container, ctx) {
     const flowHolder = container.querySelector("#energy-flow-holder");
     if (flowHolder) {
       const temps = status.temperatures;
-      flowHolder.innerHTML = energyFlowSvg({
+      flowHolder.innerHTML = energyFlowHtml({
         solarWatts: (status.solar && status.solar.watts) || 0,
         gridWatts: (status.grid && status.grid.watts) || 0,
         loadWatts: status.loadWatts || 0,
@@ -260,9 +260,12 @@ export default async function mount(container, ctx) {
     const gridCard = container.querySelector("#card-grid");
     if (gridCard) {
       gridCard.querySelector("[data-role='value']").innerHTML = `${fmtWatts(status.grid && status.grid.watts)}<span class="unit">${i18n.t("common.watts")}</span>`;
+      // Convenção interna do firmware (ver EnergyTracker.cpp): com o "sinal da
+      // rede" na posição normal, gridWatts POSITIVO é excedente a ser injetado
+      // na rede e NEGATIVO é consumo vindo da rede. Estava trocado aqui.
       const gw = (status.grid && status.grid.watts) || 0;
-      gridCard.querySelector("[data-role='import']").textContent = gw > 0 ? `${fmtWatts(gw)} W` : "0 W";
-      gridCard.querySelector("[data-role='export']").textContent = gw < 0 ? `${fmtWatts(Math.abs(gw))} W` : "0 W";
+      gridCard.querySelector("[data-role='import']").textContent = gw < 0 ? `${fmtWatts(Math.abs(gw))} W` : "0 W";
+      gridCard.querySelector("[data-role='export']").textContent = gw > 0 ? `${fmtWatts(gw)} W` : "0 W";
     }
 
     const battCard = container.querySelector("#card-battery");

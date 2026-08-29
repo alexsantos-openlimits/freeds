@@ -3,81 +3,112 @@
 // importar ou a exportar) e a potência que está a ser desviada para a
 // resistência. Tudo desenhado em SVG simples (mesmo estilo dos ícones da
 // app), sem imagens externas, e recalculado a cada atualização de estado.
+//
+// Convenção de sinal (igual à do firmware, ver EnergyTracker.cpp): gridWatts
+// POSITIVO = excedente injetado na rede; NEGATIVO = consumo vindo da rede.
+//
+// O desenho reserva "corredores" livres para os números (entre o painel e o
+// depósito, entre o controlador e o depósito, e à esquerda da casa), para que
+// nenhum valor fique por cima de um objeto. Como rede de segurança, os
+// próprios rótulos levam um contorno da cor do fundo (ver .ef-flow-label no
+// styles.css), o que os mantém legíveis mesmo em ecrãs muito estreitos.
 
 import { fmtWatts, fmtNumber } from "./dom.js";
 
-export function energyFlowSvg({ solarWatts, gridWatts, loadWatts, thermoC, hasTemp, i18n }) {
-  const importing = (gridWatts || 0) > 0;
-  const exporting = (gridWatts || 0) < 0;
-  const gridAbs = Math.abs(gridWatts || 0);
-  const heating = (loadWatts || 0) > 1;
+export function energyFlowHtml({ solarWatts, gridWatts, loadWatts, thermoC, hasTemp, i18n }) {
+  const grid = Number(gridWatts) || 0;
+  const load = Number(loadWatts) || 0;
+  const solar = Number(solarWatts) || 0;
+
+  const exporting = grid > 1;
+  const importing = grid < -1;
+  const heating = load > 1;
+  const gridState = exporting ? "ef-export" : importing ? "ef-import" : "";
+
   const tempLabel = hasTemp && thermoC !== undefined && thermoC !== null && thermoC > -100
     ? `${fmtNumber(thermoC, 1)}°C`
     : "—";
 
-  const gridLabel = importing
-    ? `${i18n.t("dashboard.grid_import")} ${fmtWatts(gridAbs)} W`
+  // Seta sobre o cabo da rede: aponta para dentro de casa quando se importa,
+  // para fora quando se exporta. Fica fora da parede, em espaço livre.
+  const arrow = importing
+    ? "M84,199 94,205 84,211"
     : exporting
-      ? `${i18n.t("dashboard.grid_export")} ${fmtWatts(gridAbs)} W`
-      : `${i18n.t("dashboard.grid_power")} 0 W`;
+      ? "M70,199 60,205 70,211"
+      : "";
+
+  const gridLabel = exporting
+    ? i18n.t("dashboard.grid_export")
+    : importing
+      ? i18n.t("dashboard.grid_import")
+      : i18n.t("dashboard.grid");
 
   return `
-    <svg class="energy-flow-svg" viewBox="0 0 480 240" role="img" aria-label="${i18n.t("dashboard.energy_flow")}">
-      <!-- sol -->
+    <svg class="energy-flow-svg" viewBox="0 0 520 300" role="img"
+         aria-label="${i18n.t("dashboard.energy_flow")}">
+      <!-- sol, por cima do painel -->
       <g class="ef-sun">
-        <circle cx="222" cy="30" r="13"/>
-        <path d="M222 8v-8M222 60v8M200 30h-8M244 30h8M206 14l-6-6M238 46l6 6M238 14l6-6M206 46l-6 6"/>
-      </g>
-
-      <!-- painel solar (encosta esquerda do telhado) -->
-      <g class="ef-panel">
-        <polygon points="103,92 188,54 202,76 116,113"/>
-        <line x1="122" y1="103" x2="181" y2="65"/>
-        <line x1="112" y1="98" x2="192" y2="60"/>
-        <line x1="132" y1="108" x2="192" y2="80"/>
+        <circle cx="150" cy="40" r="14"/>
+        <path d="M150 12v-9M150 68v9M122 40h-9M178 40h9M130 20l-6-6M170 60l6 6M170 20l6-6M130 60l-6 6"/>
       </g>
 
       <!-- casa -->
-      <polygon class="ef-roof" points="78,112 222,42 366,112"/>
-      <rect class="ef-wall" x="96" y="112" width="252" height="100" rx="2"/>
+      <polygon class="ef-roof" points="85,155 250,72 415,155"/>
+      <rect class="ef-wall" x="110" y="155" width="280" height="105"/>
+      <line class="ef-ground" x1="26" y1="261" x2="494" y2="261"/>
 
-      <!-- fio painel -> controlador -->
-      <path class="ef-wire ef-wire-solar" d="M150,100 V132 Q150,140 158,140 H176"/>
-      <text class="ef-flow-label" x="150" y="128" text-anchor="middle">${fmtWatts(solarWatts)} W</text>
+      <!-- painel solar sobre a água esquerda do telhado -->
+      <g class="ef-panel">
+        <polygon points="118,138 204,95 212,111 126,154"/>
+        <line x1="147" y1="124" x2="155" y2="140"/>
+        <line x1="175" y1="110" x2="183" y2="126"/>
+        <line x1="122" y1="146" x2="208" y2="103"/>
+      </g>
+
+      <!-- cabo painel -> controlador -->
+      <path class="ef-wire ef-wire-solar" d="M172,131 V196"/>
+      <text class="ef-flow-label ef-solar-label" x="243" y="152" text-anchor="middle">${fmtWatts(solar)} W</text>
 
       <!-- controlador -->
       <g class="ef-controller">
-        <rect x="176" y="140" width="58" height="48" rx="6"/>
-        <circle cx="205" cy="158" r="9"/>
-        <path d="M200 158h10M205 153v10"/>
-        <text x="205" y="180" text-anchor="middle" class="ef-controller-label">LUSOL</text>
+        <rect x="140" y="196" width="64" height="46" rx="7"/>
+        <circle cx="172" cy="212" r="8"/>
+        <path d="M167.5 212h9M172 207.5v9"/>
+        <text x="172" y="234" text-anchor="middle" class="ef-controller-label">LUSOL</text>
       </g>
 
-      <!-- fio controlador -> termoacumulador -->
-      <path class="ef-wire ef-wire-heat ${heating ? "ef-active" : ""}" d="M234,164 H262"/>
-      <text class="ef-flow-label ef-heat-label ${heating ? "ef-active" : ""}" x="248" y="156" text-anchor="middle">${fmtWatts(loadWatts)} W</text>
+      <!-- cabo controlador -> resistência do depósito -->
+      <path class="ef-wire ef-wire-heat ${heating ? "ef-active" : ""}" d="M204,219 H290"/>
+      <text class="ef-flow-label ef-heat-label ${heating ? "ef-active" : ""}"
+            x="247" y="210" text-anchor="middle">${fmtWatts(load)} W</text>
 
       <!-- termoacumulador -->
       <g class="ef-tank">
-        <rect x="262" y="120" width="66" height="88" rx="12"/>
-        <ellipse cx="295" cy="120" rx="33" ry="9"/>
-        <circle cx="295" cy="140" r="10" class="ef-gauge-ring"/>
-        <path d="M295 134v6l3.5 3.5" class="ef-gauge-needle"/>
-        <path class="ef-droplet" d="M295 162c7 8 7 12.5 0 18.5-7-5.5-7-10.5 0-18.5z"/>
-        <path class="ef-wave ${heating ? "ef-active" : ""}" d="M281 190q7-4.5 14 0t14 0" />
-        <text x="295" y="202" text-anchor="middle" class="ef-temp-label">${tempLabel}</text>
+        <rect x="290" y="162" width="72" height="98" rx="13"/>
+        <ellipse cx="326" cy="162" rx="36" ry="9"/>
+        <circle class="ef-gauge-ring" cx="326" cy="186" r="11"/>
+        <path class="ef-gauge-needle" d="M326 180v6l4 4"/>
+        <path class="ef-droplet" d="M326 206c7.5 8.5 7.5 13.5 0 19.5-7.5-6-7.5-11 0-19.5z"/>
+        <path class="ef-wave ${heating ? "ef-active" : ""}" d="M310 236q8-5 16 0t16 0"/>
+        <text x="326" y="254" text-anchor="middle" class="ef-temp-label">${tempLabel}</text>
       </g>
 
-      <!-- poste + ligação à rede -->
+      <!-- poste e ligação à rede -->
       <g class="ef-pole">
-        <line x1="34" y1="70" x2="34" y2="212"/>
-        <line x1="20" y1="82" x2="48" y2="82"/>
-        <line x1="24" y1="82" x2="24" y2="70"/>
-        <line x1="44" y1="82" x2="44" y2="70"/>
+        <line x1="48" y1="104" x2="48" y2="261"/>
+        <line x1="32" y1="118" x2="64" y2="118"/>
+        <line x1="37" y1="118" x2="37" y2="105"/>
+        <line x1="59" y1="118" x2="59" y2="105"/>
       </g>
-      <path class="ef-wire ef-grid-wire ${importing ? "ef-import" : exporting ? "ef-export" : ""}" d="M34,150 H96"/>
-      <path class="ef-grid-arrow ${importing ? "ef-import" : exporting ? "ef-export" : ""}"
-        d="${importing ? "M74,144 84,150 74,156" : "M56,144 46,150 56,156"}" />
-      <text class="ef-flow-label ef-grid-label ${importing ? "ef-import" : exporting ? "ef-export" : ""}" x="65" y="132" text-anchor="middle">${gridLabel}</text>
-    </svg>`;
+      <path class="ef-wire ef-grid-wire ${gridState}" d="M48,205 H110"/>
+      ${arrow ? `<path class="ef-grid-arrow ${gridState}" d="${arrow}"/>` : ""}
+      <text class="ef-flow-label ef-grid-label ${gridState}" x="79" y="192" text-anchor="middle">${fmtWatts(Math.abs(grid))} W</text>
+      <text class="ef-node-caption" x="62" y="228" text-anchor="middle">${gridLabel}</text>
+    </svg>
+
+    <div class="ef-legend">
+      <span class="ef-legend-item"><i class="ef-dot ef-dot-solar"></i>${i18n.t("dashboard.solar_power")}</span>
+      <span class="ef-legend-item"><i class="ef-dot ef-dot-heat"></i>${i18n.t("dashboard.legend_diverted")}</span>
+      <span class="ef-legend-item"><i class="ef-dot ef-dot-grid"></i>${i18n.t("dashboard.grid_power")}</span>
+    </div>`;
 }

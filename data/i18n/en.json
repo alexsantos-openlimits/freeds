@@ -66,6 +66,7 @@
   "dashboard": {
     "title": "Dashboard",
     "energy_flow": "Energy Flow",
+    "legend_diverted": "Diverted to heater",
     "working_mode": "Working mode",
     "mode_auto": "Automatic",
     "mode_manual": "Manual",

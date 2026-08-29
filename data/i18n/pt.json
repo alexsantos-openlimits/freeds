@@ -66,6 +66,7 @@
   "dashboard": {
     "title": "Painel",
     "energy_flow": "Fluxo de Energia",
+    "legend_diverted": "Desviada para a resistência",
     "working_mode": "Modo de funcionamento",
     "mode_auto": "Automático",
     "mode_manual": "Manual",
