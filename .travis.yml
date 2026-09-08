@@ -19,7 +19,6 @@
 # Travis CI documentation (see above).
 #
 
-
 language: python
 python:
     - "2.7"
