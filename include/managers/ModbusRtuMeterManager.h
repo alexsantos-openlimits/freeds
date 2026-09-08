@@ -37,6 +37,12 @@ private:
   static const int8_t kTxPin = 23;
   static const uint32_t kReceiveTimeoutMs = 10; // igual ao original (modbusReceiveBuffer)
 
+  // O DDSU666 lê um registo por passo; são precisos 8 passos para um ciclo
+  // completo (ver loop()). O mínimo por passo dá tempo à resposta do
+  // contador e evita saturar o barramento RS485 com pedidos.
+  static const uint8_t kDdsu666States = 8;
+  static const uint32_t kMinStepIntervalMs = 60;
+
   HardwareSerial serial_;
 
   uint8_t lastMode_ = 0;

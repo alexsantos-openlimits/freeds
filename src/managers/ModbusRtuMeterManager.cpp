@@ -43,8 +43,26 @@ void ModbusRtuMeterManager::loop() {
   }
 
   uint32_t interval = cfg.pollIntervalMs > 0 ? cfg.pollIntervalMs : 1500;
+
+  // O DDSU666 não devolve tudo num pedido: precisa de 8 leituras seguidas
+  // (tensão, corrente, potência, reativa, cos phi, frequência, energia
+  // importada e exportada) e só a 3ª (0x2004) traz a potência de rede, que é
+  // o valor que comanda o PWM. Se o intervalo configurado fosse aplicado a
+  // CADA leitura, um ciclo completo demorava 8x o intervalo (12 s por
+  // omissão) e o PID - que calcula a cada segundo - ficava mais de dez
+  // segundos a integrar sobre uma potência de rede desatualizada, subindo o
+  // PWM muito acima do excedente real (o dispositivo passava a importar da
+  // rede). Aqui o intervalo passa a valer para o CICLO completo, ficando a
+  // potência de rede tão fresca como nos contadores que respondem de uma só
+  // vez. O mínimo por passo evita inundar o barramento RS485.
+  uint32_t stepInterval = interval;
+  if (cfg.mode == DDSU666_METER) {
+    stepInterval = interval / kDdsu666States;
+    if (stepInterval < kMinStepIntervalMs) { stepInterval = kMinStepIntervalMs; }
+  }
+
   uint32_t now = millis();
-  if (now - lastTickMs_ < interval) { return; }
+  if (now - lastTickMs_ < stepInterval) { return; }
   lastTickMs_ = now;
 
   switch (cfg.mode) {

@@ -8,6 +8,22 @@ extern "C" {
 #include <driver/dac.h>
 }
 
+namespace {
+
+// Período de cálculo do PID. O original usava 1000 ms fixos, o que assume
+// que a fonte de dados traz uma leitura nova pelo menos uma vez por segundo.
+// Se o intervalo de consulta configurado for mais lento, o PID integrava
+// várias vezes sobre a MESMA potência de rede e subia o PWM acima do
+// excedente real antes de ver o efeito da sua própria saída. Acompanhar o
+// ritmo real dos dados evita esse "windup" (a biblioteca reajusta ki/kd ao
+// novo período, por isso o ganho por segundo mantém-se).
+uint32_t pidSampleTimeMs() {
+  uint32_t poll = ConfigStore::get().surplus.pollIntervalMs;
+  return poll > 1000 ? poll : 1000;
+}
+
+} // namespace
+
 LoadController::LoadController()
     : pid_(&pidInput_, &pidOutput_, &pidSetpoint_, 0.05f, 0.06f, 0.03f, PID::DIRECT) {}
 
@@ -26,7 +42,7 @@ void LoadController::begin(const LoadControllerPins &pins) {
   ledcWrite(pins_.ledcChannel, 0);
   dac_output_enable((dac_channel_t)pins_.dacChannel);
 
-  pid_.SetSampleTime(1000);
+  pid_.SetSampleTime((int)pidSampleTimeMs());
   load.dimmerLowCost ? pid_.SetOutputLimits(209, load.maxPwmLowCost) : pid_.SetOutputLimits(0, 1023);
   pid_.SetMode(load.manualMode ? PID::MANUAL : PID::AUTOMATIC);
   pid_.SetControllerDirection(ConfigStore::get().surplus.changeGridSign ? PID::DIRECT : PID::REVERSE);
@@ -42,6 +58,9 @@ void LoadController::reloadTunables() {
 
   ledcSetup(pins_.ledcChannel, (double)load.pwmFrequencyHz / 10.0, 10);
   load.dimmerLowCost ? pid_.SetOutputLimits(209, load.maxPwmLowCost) : pid_.SetOutputLimits(0, 1023);
+  // O intervalo de consulta vive na secção "surplus", que também chama este
+  // método - por isso o período do PID é reavaliado aqui.
+  pid_.SetSampleTime((int)pidSampleTimeMs());
   // A direção tem de ser definida ANTES das constantes: SetTunings() aplica o
   // sinal de acordo com a direção já registada, enquanto SetControllerDirection()
   // só troca o sinal das constantes quando o PID está em modo automático. Pela
